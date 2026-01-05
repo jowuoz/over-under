@@ -13,12 +13,12 @@ import json
 from datetime import datetime
 
 def main():
-    print(f"🚀 Starting prediction run at {datetime.now()}")
+    print(f" Starting prediction run at {datetime.now()}")
     
     # 1. Scrape live games
     scraper = ScraperManager()
     games = scraper.get_live_games()
-    print(f"📊 Found {len(games)} live games")
+    print(f" Found {len(games)} live games")
     
     # 2. Calculate probabilities
     calculator = ProbabilityCalculator()
@@ -42,7 +42,7 @@ def main():
     # 4. Save results
     save_results(predictions, high_prob_games)
     
-    print(f"✅ Run completed: {len(predictions)} predictions, {len(high_prob_games)} alerts")
+    print(f" Run completed: {len(predictions)} predictions, {len(high_prob_games)} alerts")
 
 def save_results(predictions, high_prob_games):
     """Save results for dashboard"""
