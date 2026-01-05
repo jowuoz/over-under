@@ -1,1 +1,24 @@
+system:
+  name: "Over/Under Predictor"
+  update_interval: 300  # Run every 5 minutes
+  timezone: "UTC"
 
+scrapers:
+  active: ["flashscore"]  # Start with just one
+  request_delay: 2  # Seconds between requests
+  timeout: 10  # Request timeout in seconds
+
+predictor:
+  thresholds:
+    over_0.5: 0.85
+    over_1.5: 0.80
+    over_2.5: 0.75
+    over_3.5: 0.70
+  min_minute: 20  # Don't analyze before 20th minute
+  max_minute: 80  # Don't analyze after 80th minute
+
+notifications:
+  telegram:
+    enabled: true
+    # Token and chat ID will come from GitHub Secrets
+  min_confidence: 0.60  # Only send alerts with 60%+ confidence
