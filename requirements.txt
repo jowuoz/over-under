@@ -1,0 +1,14 @@
+# Core dependencies
+requests==2.31.0
+beautifulsoup4==4.12.2
+aiohttp==3.9.1
+
+# Data processing
+pandas==2.1.4
+numpy==1.24.3
+
+# Telegram notifications
+python-telegram-bot==20.6
+
+# HTML reporting
+Jinja2==3.1.2
