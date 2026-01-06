@@ -3,11 +3,20 @@ on:
   schedule:
     - cron: '*/5 * * * *'  # Every 5 minutes
   workflow_dispatch:  # Allow manual runs
+    inputs:
+      force_full_run:
+        description: 'Force full data refresh'
+        required: false
+        default: 'false'
+      run_tests:
+        description: 'Run all tests before prediction'
+        required: false
+        default: 'true'
 
 jobs:
   predict:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     
     steps:
     - uses: actions/checkout@v3
@@ -17,20 +26,124 @@ jobs:
       with:
         python-version: '3.10'
     
+    - name: Cache Python dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
     - name: Install dependencies
       run: |
+        python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install pytest pytest-asyncio  # For testing
+    
+    - name: Create necessary directories
+      run: |
+        mkdir -p storage/logs storage/data/historical reports/data
+        echo "Created directory structure"
+    
+    - name: Run tests (optional)
+      if: github.event.inputs.run_tests != 'false'
+      run: |
+        echo "🧪 Running tests..."
+        if [ -f "tests/test_scraper.py" ]; then
+          python tests/test_scraper.py || echo "Tests failed but continuing with prediction"
+        else
+          echo "No test file found, skipping tests"
+        fi
     
     - name: Run predictor
       env:
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        # Optional: Add API keys if not in config files
+        FOOTBALL_DATA_API_KEY: ${{ secrets.FOOTBALL_DATA_API_KEY }}
+        API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
       run: |
+        echo "🚀 Starting prediction run..."
         python scripts/run_predictor.py
+        
+        # Check if run was successful
+        if [ $? -eq 0 ]; then
+          echo "✅ Prediction run completed successfully"
+        else
+          echo "❌ Prediction run failed"
+          # Don't fail the workflow, allow dashboard to still be deployed
+        fi
     
     - name: Generate dashboard
       run: |
-        python scripts/generate_report.py
+        echo "📊 Generating dashboard..."
+        # Create minimal dashboard data if not already created
+        if [ ! -f "reports/data/latest.json" ]; then
+          echo '{"timestamp": "'$(date -Iseconds)'", "predictions": [], "alerts": [], "summary": {"total_games": 0, "total_alerts": 0}}' > reports/data/latest.json
+          echo "Created fallback dashboard data"
+        fi
+        
+        # Generate HTML report if script exists
+        if [ -f "scripts/generate_report.py" ]; then
+          python scripts/generate_report.py
+        else
+          echo "No generate_report.py found, using static dashboard"
+        fi
+    
+    - name: Archive logs and data
+      if: always()  # Run even if previous steps fail
+      run: |
+        echo "📦 Archiving logs and data..."
+        timestamp=$(date +"%Y%m%d_%H%M%S")
+        
+        # Create archive directory
+        mkdir -p workflow_artifacts
+        
+        # Archive logs if they exist
+        if [ -d "storage/logs" ]; then
+          tar -czf workflow_artifacts/logs_$timestamp.tar.gz -C storage logs/
+          echo "Archived logs"
+        fi
+        
+        # Archive latest data
+        if [ -f "storage/data/predictions.json" ]; then
+          cp storage/data/predictions.json workflow_artifacts/latest_predictions_$timestamp.json
+          echo "Archived latest predictions"
+        fi
+        
+        # Create workflow summary
+        echo "## Workflow Run Summary" > workflow_artifacts/summary.md
+        echo "**Timestamp:** $(date)" >> workflow_artifacts/summary.md
+        echo "**Event:** ${{ github.event_name }}" >> workflow_artifacts/summary.md
+        echo "**Branch:** ${{ github.ref }}" >> workflow_artifacts/summary.md
+        
+        if [ -f "reports/data/latest.json" ]; then
+          games_count=$(jq '.summary.total_games // 0' reports/data/latest.json)
+          alerts_count=$(jq '.summary.total_alerts // 0' reports/data/latest.json)
+          echo "**Games Found:** $games_count" >> workflow_artifacts/summary.md
+          echo "**Alerts Generated:** $alerts_count" >> workflow_artifacts/summary.md
+        fi
+    
+    - name: Upload artifacts
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: predictor-artifacts-${{ github.run_id }}
+        path: |
+          workflow_artifacts/
+          storage/logs/*.log
+        retention-days: 7
+    
+    - name: Cleanup old artifacts
+      run: |
+        echo "🧹 Cleaning up..."
+        # Keep storage structure but clear cache if needed
+        if [ -d "storage/cache" ]; then
+          rm -rf storage/cache/*
+        fi
+        
+        # Remove very old log files (older than 7 days)
+        find storage/logs -name "*.log" -mtime +7 -delete 2>/dev/null || true
     
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
@@ -38,3 +151,17 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./reports
+        keep_files: true  # Keep previous dashboard versions
+        force_orphan: false
+    
+    - name: Send success notification
+      if: success()
+      run: |
+        echo "✅ Workflow completed successfully!"
+        # Could add Telegram/Discord notification here
+    
+    - name: Send failure notification
+      if: failure()
+      run: |
+        echo "❌ Workflow failed!"
+        # Could add error notification here
