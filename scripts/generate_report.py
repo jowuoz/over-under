@@ -23,6 +23,9 @@ import seaborn as sns
 # Add parent directory to path for imports
 sys.path.append(str(Path(__file__).parent.parent))
 
+# Then define report path
+REPORT_PATH = "reports/index.html"  # ← This is the key line
+
 try:
     from config import get_config
     from src.scrapers.base_scraper import ScrapedGame, DataSourceType
