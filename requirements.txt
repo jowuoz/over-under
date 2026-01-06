@@ -12,3 +12,15 @@ python-telegram-bot==20.6
 
 # HTML reporting
 Jinja2==3.1.2
+
+# Configuration - ADD THIS
+PyYAML==6.0.1
+
+# Logging and utilities - ADD THESE
+loguru==0.7.2
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+# Fix import compatibility - ADD THESE
+typing-extensions==4.9.0
+importlib-metadata==6.8.0
