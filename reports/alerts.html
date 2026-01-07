@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚠️ Alerts Report - Over/Under Predictor</title>
+    
+    <!-- CSS Links -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Additional Styles for Alerts Page -->
+    <style>
+        /* Alert Page Specific Styles */
+        .page-header {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .summary-card h3 {
+            font-size: 1rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+        }
+        
+        .summary-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .summary-desc {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+        
+        .card-danger { border-top: 4px solid #ef4444; }
+        .card-warning { border-top: 4px solid #f59e0b; }
+        .card-secondary { border-top: 4px solid #64748b; }
+        
+        .table-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .search-input {
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            width: 250px;
+            font-size: 0.9rem;
+        }
+        
+        .filter-select {
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            background: white;
+            font-size: 0.9rem;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+        
+        .data-table thead {
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .data-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            white-space: nowrap;
+        }
+        
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+        
+        .probability-bar {
+            background: #e2e8f0;
+            height: 8px;
+            border-radius: 4px;
+            width: 100%;
+            position: relative;
+            margin: 0.5rem 0;
+        }
+        
+        .bar-fill {
+            background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+            height: 100%;
+            border-radius: 4px;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        
+        .probability-bar span {
+            position: absolute;
+            right: -40px;
+            top: -8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-secondary { background: #f1f5f9; color: #475569; }
+        
+        .btn-table {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background 0.2s;
+        }
+        
+        .btn-table:hover {
+            background: #2563eb;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+        
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .page-btn:hover {
+            background: #f1f5f9;
+        }
+        
+        .page-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .trends-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .trend-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .trend-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #475569;
+        }
+        
+        .trend-placeholder {
+            text-align: center;
+            padding: 3rem;
+            color: #94a3b8;
+        }
+        
+        .trend-placeholder i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        /* Stats grid for summary */
+        .stats-mini-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .stat-mini {
+            text-align: center;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+        }
+        
+        .stat-mini-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .stat-mini-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+        
+        /* Alert status indicators */
+        .alert-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .status-active { background: #10b981; }
+        .status-expired { background: #94a3b8; }
+        .status-closed { background: #3b82f6; }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-input, .filter-select {
+                width: 100%;
+            }
+            
+            .trends-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-mini-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .data-table {
+                font-size: 0.9rem;
+            }
+            
+            .data-table th, .data-table td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Page Header -->
+        <header class="page-header">
+            <h1><i class="fas fa-exclamation-triangle"></i> Alerts Report</h1>
+            <div class="header-actions">
+                <a href="index.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+                <button class="btn-export" onclick="exportAlerts()">
+                    <i class="fas fa-download"></i> Export CSV
+                </button>
+                <button class="btn-back" style="background: #10b981;" onclick="refreshAlerts()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card card-danger">
+                <h3>High Confidence Alerts</h3>
+                <p class="summary-number" id="highAlertsCount">0</p>
+                <p class="summary-desc">Confidence ≥ 80%</p>
+            </div>
+            
+            <div class="summary-card card-warning">
+                <h3>Medium Confidence Alerts</h3>
+                <p class="summary-number" id="mediumAlertsCount">0</p>
+                <p class="summary-desc">60% ≤ Confidence < 80%</p>
+            </div>
+            
+            <div class="summary-card card-secondary">
+                <h3>Low Confidence Alerts</h3>
+                <p class="summary-number" id="lowAlertsCount">0</p>
+                <p class="summary-desc">Confidence < 60%</p>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="section">
+            <h2><i class="fas fa-chart-line"></i> Quick Stats</h2>
+            <div class="stats-mini-grid">
+                <div class="stat-mini">
+                    <div class="stat-mini-value" id="totalAlerts">0</div>
+                    <div class="stat-mini-label">Total Alerts</div>
+                </div>
+                <div class="stat-mini">
+                    <div class="stat-mini-value" id="activeAlerts">0</div>
+                    <div class="stat-mini-label">Active Now</div>
+                </div>
+                <div class="stat-mini">
+                    <div class="stat-mini-value" id="avgProbability">0%</div>
+                    <div class="stat-mini-label">Avg Probability</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts Table -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-list"></i> All Alerts (<span id="totalAlertsCount">0</span>)</h2>
+                <div class="table-controls">
+                    <input type="text" id="alertSearch" placeholder="Search alerts..." class="search-input">
+                    <select id="alertFilter" class="filter-select">
+                        <option value="all">All Alerts</option>
+                        <option value="high">High Confidence</option>
+                        <option value="medium">Medium Confidence</option>
+                        <option value="low">Low Confidence</option>
+                        <option value="active">Active Only</option>
+                        <option value="today">Today Only</option>
+                    </select>
+                    <select id="leagueFilter" class="filter-select">
+                        <option value="all">All Leagues</option>
+                        <option value="premier">Premier League</option>
+                        <option value="laliga">La Liga</option>
+                        <option value="bundesliga">Bundesliga</option>
+                        <option value="seriea">Serie A</option>
+                        <option value="champions">Champions League</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="alertsTable">
+                    <thead>
+                        <tr>
+                            <th>Match</th>
+                            <th>League</th>
+                            <th>Score</th>
+                            <th>Minute</th>
+                            <th>Over 2.5 Prob</th>
+                            <th>Confidence</th>
+                            <th>Status</th>
+                            <th>Time</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alertsTableBody">
+                        <!-- Alerts will be loaded here by JavaScript -->
+                        <tr id="loadingRow">
+                            <td colspan="9" style="text-align: center; padding: 3rem;">
+                                <div class="empty-state">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <p>Loading alerts...</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="pagination" id="alertsPagination">
+                <!-- Pagination will be generated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Alert Trends -->
+        <div class="section">
+            <h2><i class="fas fa-chart-line"></i> Alert Trends</h2>
+            <div class="trends-container">
+                <div class="trend-card">
+                    <h4><i class="fas fa-chart-bar"></i> Alerts by Hour (Last 24h)</h4>
+                    <div class="trend-placeholder" id="hourlyChart">
+                        <i class="fas fa-chart-bar"></i>
+                        <p>Hourly distribution chart would appear here</p>
+                    </div>
+                </div>
+                <div class="trend-card">
+                    <h4><i class="fas fa-percentage"></i> Success Rate by Confidence Level</h4>
+                    <div class="trend-placeholder" id="successRateChart">
+                        <i class="fas fa-percentage"></i>
+                        <p>Success rate analysis would appear here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="section">
+            <h2><i class="fas fa-history"></i> Recent Activity</h2>
+            <div id="recentActivity">
+                <div class="empty-state" style="padding: 2rem;">
+                    <i class="fas fa-clock"></i>
+                    <p>Recent activity will appear here</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p><i class="fas fa-code"></i> Over/Under Predictor System</p>
+                    <p><i class="fas fa-clock"></i> Last updated: <span id="lastUpdated">Just now</span></p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html"><i class="fas fa-home"></i> Dashboard</a>
+                    <a href="statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a>
+                    <a href="performance.html"><i class="fas fa-tachometer-alt"></i> Performance</a>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                <p>© <span id="currentYear">2024</span> Over/Under Predictor. All data is for informational purposes only.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/alerts.js"></script>
+    
+    <!-- Additional Alert Page JavaScript -->
+    <script>
+        // Alert Page JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current year in footer
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            
+            // Load alerts data
+            loadAlertsData();
+            
+            // Set up refresh interval (every 30 seconds)
+            setInterval(refreshAlerts, 30000);
+            
+            // Initialize search functionality
+            initializeSearch();
+            
+            // Simulate data loading for demo
+            simulateDataLoad();
+        });
+        
+        function loadAlertsData() {
+            console.log('Loading alerts data...');
+            
+            // Try to load from local storage first
+            const cachedAlerts = localStorage.getItem('alertsData');
+            if (cachedAlerts) {
+                const data = JSON.parse(cachedAlerts);
+                updateAlertsTable(data.alerts || []);
+                updateSummaryStats(data.stats || {});
+            }
+            
+            // Then try to load from API/data file
+            fetchAlertsFromSource();
+        }
+        
+        function fetchAlertsFromSource() {
+            // First try to load from data/latest.json
+            fetch('data/latest.json')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    // Process and display data
+                    processAlertsData(data);
+                })
+                .catch(error => {
+                    console.log('Could not load from latest.json, trying alternative source...', error);
+                    
+                    // Fallback to static sample data
+                    loadSampleData();
+                });
+        }
+        
+        function processAlertsData(data) {
+            // Extract alerts from data structure
+            const alerts = data.alerts || data.predictions || [];
+            const stats = data.summary || {};
+            
+            // Cache the data
+            localStorage.setItem('alertsData', JSON.stringify({ alerts, stats }));
+            
+            // Update UI
+            updateAlertsTable(alerts);
+            updateSummaryStats(stats);
+            updateLastUpdated();
+        }
+        
+        function updateAlertsTable(alerts) {
+            const tableBody = document.getElementById('alertsTableBody');
+            const loadingRow = document.getElementById('loadingRow');
+            
+            if (loadingRow) {
+                loadingRow.remove();
+            }
+            
+            if (alerts.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 3rem;">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>No alerts found</p>
+                                <p class="small-text">Check back later for new predictions</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Sort by probability (highest first)
+            alerts.sort((a, b) => (b.over_25_prob || 0) - (a.over_25_prob || 0));
+            
+            let html = '';
+            alerts.forEach((alert, index) => {
+                const probability = (alert.over_25_prob || 0) * 100;
+                const confidence = (alert.confidence || 0) * 100;
+                const homeScore = alert.home_score || 0;
+                const awayScore = alert.away_score || 0;
+                const minute = alert.minute || 'FT';
+                const league = alert.league || 'Unknown League';
+                const status = getAlertStatus(alert);
+                
+                // Determine badge class
+                let badgeClass, statusText;
+                if (probability >= 80) {
+                    badgeClass = 'badge-success';
+                    statusText = 'HIGH';
+                } else if (probability >= 70) {
+                    badgeClass = 'badge-warning';
+                    statusText = 'MEDIUM';
+                } else {
+                    badgeClass = 'badge-secondary';
+                    statusText = 'LOW';
+                }
+                
+                // Format time
+                const alertTime = formatAlertTime(alert.timestamp);
+                
+                html += `
+                <tr class="alert-row" data-confidence="${confidence}" data-league="${league.toLowerCase()}" data-status="${status}">
+                    <td>
+                        <strong>${alert.home_team || 'Home'}</strong> vs 
+                        <strong>${alert.away_team || 'Away'}</strong>
+                    </td>
+                    <td>${league}</td>
+                    <td>${homeScore} - ${awayScore}</td>
+                    <td>${minute}'</td>
+                    <td>
+                        <div class="probability-bar">
+                            <div class="bar-fill" style="width: ${probability}%"></div>
+                            <span>${probability.toFixed(1)}%</span>
+                        </div>
+                    </td>
+                    <td>${confidence.toFixed(1)}%</td>
+                    <td>
+                        <span class="badge ${badgeClass}">${statusText}</span>
+                        <div class="alert-status">
+                            <span class="status-dot status-${status}"></span>
+                            <span>${status}</span>
+                        </div>
+                    </td>
+                    <td>${alertTime}</td>
+                    <td>
+                        <button class="btn-table" onclick="viewAlertDetails('${alert.id || index}')">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                    </td>
+                </tr>
+                `;
+            });
+            
+            tableBody.innerHTML = html;
+            updatePagination();
+            updateTotalAlertsCount(alerts.length);
+        }
+        
+        function updateSummaryStats(stats) {
+            // Update summary cards with real data or calculate from alerts
+            const highCount = document.querySelectorAll('.alert-row[data-confidence*="80"]').length;
+            const mediumCount = document.querySelectorAll('.alert-row[data-confidence*="60"]').length;
+            const lowCount = document.querySelectorAll('.alert-row[data-confidence*="60"]').length;
+            
+            document.getElementById('highAlertsCount').textContent = highCount;
+            document.getElementById('mediumAlertsCount').textContent = mediumCount;
+            document.getElementById('lowAlertsCount').textContent = lowCount;
+            
+            // Update quick stats
+            const totalAlerts = document.querySelectorAll('.alert-row').length;
+            const activeAlerts = document.querySelectorAll('.alert-row[data-status="active"]').length;
+            
+            document.getElementById('totalAlerts').textContent = totalAlerts;
+            document.getElementById('activeAlerts').textContent = activeAlerts;
+            
+            // Calculate average probability
+            const rows = document.querySelectorAll('.alert-row');
+            let totalProb = 0;
+            rows.forEach(row => {
+                const probText = row.querySelector('.probability-bar span').textContent;
+                totalProb += parseFloat(probText);
+            });
+            const avgProb = rows.length > 0 ? (totalProb / rows.length).toFixed(1) : 0;
+            document.getElementById('avgProbability').textContent = avgProb + '%';
+        }
+        
+        function updateTotalAlertsCount(count) {
+            document.getElementById('totalAlertsCount').textContent = count;
+        }
+        
+        function getAlertStatus(alert) {
+            if (alert.status === 'live' || alert.status === 'LIVE') {
+                return 'active';
+            } else if (alert.status === 'finished' || alert.status === 'FT') {
+                return 'closed';
+            } else {
+                return 'expired';
+            }
+        }
+        
+        function formatAlertTime(timestamp) {
+            if (!timestamp) return 'N/A';
+            
+            try {
+                const date = new Date(timestamp);
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            } catch (e) {
+                return 'N/A';
+            }
+        }
+        
+        function updateLastUpdated() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('lastUpdated').textContent = timeString;
+        }
+        
+        function refreshAlerts() {
+            console.log('Refreshing alerts...');
+            document.getElementById('alertsTableBody').innerHTML = `
+                <tr id="loadingRow">
+                    <td colspan="9" style="text-align: center; padding: 3rem;">
+                        <div class="empty-state">
+                            <i class="fas fa-sync-alt fa-spin"></i>
+                            <p>Refreshing alerts...</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            
+            // Clear cache and reload
+            localStorage.removeItem('alertsData');
+            setTimeout(() => {
+                loadAlertsData();
+                showNotification('Alerts refreshed successfully!', 'success');
+            }, 1000);
+        }
+        
+        function initializeSearch() {
+            const searchInput = document.getElementById('alertSearch');
+            const filterSelect = document.getElementById('alertFilter');
+            const leagueFilter = document.getElementById('leagueFilter');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', filterAlerts);
+            }
+            
+            if (filterSelect) {
+                filterSelect.addEventListener('change', filterAlerts);
+            }
+            
+            if (leagueFilter) {
+                leagueFilter.addEventListener('change', filterAlerts);
+            }
+        }
+        
+        function filterAlerts() {
+            const searchTerm = document.getElementById('alertSearch').value.toLowerCase();
+            const filterValue = document.getElementById('alertFilter').value;
+            const leagueValue = document.getElementById('leagueFilter').value;
+            
+            const rows = document.querySelectorAll('.alert-row');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const confidence = parseFloat(row.getAttribute('data-confidence'));
+                const league = row.getAttribute('data-league');
+                const status = row.getAttribute('data-status');
+                
+                // Check search term
+                let matchesSearch = searchTerm === '' || text.includes(searchTerm);
+                
+                // Check confidence filter
+                let matchesFilter = true;
+                if (filterValue === 'high') {
+                    matchesFilter = confidence >= 80;
+                } else if (filterValue === 'medium') {
+                    matchesFilter = confidence >= 60 && confidence < 80;
+                } else if (filterValue === 'low') {
+                    matchesFilter = confidence < 60;
+                } else if (filterValue === 'active') {
+                    matchesFilter = status === 'active';
+                } else if (filterValue === 'today') {
+                    // Simplified today filter
+                    matchesFilter = true;
+                }
+                
+                // Check league filter
+                let matchesLeague = true;
+                if (leagueValue !== 'all') {
+                    matchesLeague = league.includes(leagueValue);
+                }
+                
+                // Show/hide row
+                const shouldShow = matchesSearch && matchesFilter && matchesLeague;
+                row.style.display = shouldShow ? '' : 'none';
+                
+                if (shouldShow) visibleCount++;
+            });
+            
+            updateTotalAlertsCount(visibleCount);
+            updatePagination();
+        }
+        
+        function updatePagination() {
+            // This function is already in alerts.js
+            // It will be called after table updates
+        }
+        
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            // Add styles for notification
+            if (!document.querySelector('.notification-container')) {
+                const container = document.createElement('div');
+                container.className = 'notification-container';
+                document.body.appendChild(container);
+            }
+            
+            document.querySelector('.notification-container').appendChild(notification);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 3000);
+        }
+        
+        // Demo data for testing
+        function simulateDataLoad() {
+            // This simulates loading data if no real data is available
+            setTimeout(() => {
+                const loadingRow = document.getElementById('loadingRow');
+                if (loadingRow && loadingRow.parentElement) {
+                    // Check if data was already loaded
+                    const hasData = document.querySelectorAll('.alert-row').length > 0;
+                    if (!hasData) {
+                        // Load sample data
+                        loadSampleData();
+                    }
+                }
+            }, 2000);
+        }
+        
+        function loadSampleData() {
+            const sampleAlerts = [
+                {
+                    id: 1,
+                    home_team: 'Manchester City',
+                    away_team: 'Liverpool',
+                    league: 'Premier League',
+                    home_score: 2,
+                    away_score: 1,
+                    minute: 75,
+                    over_25_prob: 0.85,
+                    confidence: 0.92,
+                    timestamp: new Date().toISOString(),
+                    status: 'live'
+                },
+                {
+                    id: 2,
+                    home_team: 'Real Madrid',
+                    away_team: 'Barcelona',
+                    league: 'La Liga',
+                    home_score: 1,
+                    away_score: 1,
+                    minute: 60,
+                    over_25_prob: 0.72,
+                    confidence: 0.78,
+                    timestamp: new Date().toISOString(),
+                    status: 'live'
+                }
+            ];
+            
+            updateAlertsTable(sampleAlerts);
+            updateSummaryStats({
+                high_alerts: 1,
+                medium_alerts: 1,
+                low_alerts: 0,
+                total_alerts: 2,
+                active_alerts: 2
+            });
+            
+            showNotification('Loaded sample data for demonstration', 'info');
+        }
+        
+        // View alert details function
+        window.viewAlertDetails = function(alertId) {
+            console.log('Viewing alert details:', alertId);
+            // In a real implementation, this would open a modal or navigate to a details page
+            alert(`Alert details for ID: ${alertId}\n\nThis would show detailed analysis and predictions.`);
+        };
+        
+        // Export function
+        window.exportAlerts = function() {
+            // This function is already in alerts.js
+            // It will handle CSV export
+            console.log('Exporting alerts...');
+        };
+    </script>
+    
+    <!-- Notification Styles -->
+    <style>
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .notification {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+            animation: slideIn 0.3s ease-out;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .notification-success {
+            border-left-color: #10b981;
+        }
+        
+        .notification-info {
+            border-left-color: #3b82f6;
+        }
+        
+        .notification-warning {
+            border-left-color: #f59e0b;
+        }
+        
+        .notification button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #64748b;
+            margin-left: auto;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .small-text {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+    </style>
+</body>
+</html>
