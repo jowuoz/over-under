@@ -1,29 +1,11 @@
 def generate_css(self):
-    """Generate COMPLETE CSS stylesheet synchronized with all HTML sections"""
+    """Generate PERFECT CSS stylesheet - COMPLETE AND SYNCHRONIZED"""
     # Create the directory first
     css_dir = self.reports_dir / "css"
     css_dir.mkdir(exist_ok=True)
     
-    css_content = f"""
-/* COMPLETE CSS for Over/Under Predictor Dashboard - FULLY SYNCHRONIZED */
-/* Version: 1.0 | Mobile-First Responsive Design */
-
-/* ===== CSS LOADED VERIFICATION ===== */
-body::after {{
-    content: '✅ CSS Loaded Successfully';
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    background: #10b981;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 12px;
-    z-index: 9999;
-    opacity: 0.9;
-    font-weight: bold;
-    display: none; /* Remove this line to see verification */
-}}
+    css_content = f"""/* PERFECT CSS for Over/Under Predictor Dashboard */
+/* Version: 2.0 | Fully Synchronized | Mobile-First */
 
 /* ===== CSS VARIABLES ===== */
 :root {{
@@ -40,7 +22,7 @@ body::after {{
     --over-25: {self.colors['over_25']};
     --under-25: {self.colors['under_25']};
     
-    /* Additional Colors */
+    /* Theme Colors */
     --success-dark: #059669;
     --warning-dark: #d97706;
     --danger-dark: #dc2626;
@@ -56,11 +38,6 @@ body::after {{
     --gray-800: #1e293b;
     --gray-900: #0f172a;
     
-    /* Status Colors */
-    --high-confidence: {self.colors['high_confidence']};
-    --medium-confidence: {self.colors['medium_confidence']};
-    --low-confidence: {self.colors['low_confidence']};
-    
     /* Spacing */
     --space-xs: 0.25rem;
     --space-sm: 0.5rem;
@@ -68,7 +45,6 @@ body::after {{
     --space-lg: 1.5rem;
     --space-xl: 2rem;
     --space-2xl: 3rem;
-    --space-3xl: 4rem;
     
     /* Border Radius */
     --radius-sm: 0.25rem;
@@ -82,24 +58,14 @@ body::after {{
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-    --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
     
     /* Transitions */
-    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
-    
-    /* Z-index layers */
-    --z-dropdown: 1000;
-    --z-sticky: 1020;
-    --z-fixed: 1030;
-    --z-modal-backdrop: 1040;
-    --z-modal: 1050;
-    --z-popover: 1060;
-    --z-tooltip: 1070;
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+    --transition-slow: 350ms ease;
 }}
 
-/* ===== RESET & BASE STYLES ===== */
+/* ===== RESET & BASE ===== */
 *, *::before, *::after {{
     margin: 0;
     padding: 0;
@@ -109,54 +75,20 @@ body::after {{
 html {{
     font-size: 16px;
     scroll-behavior: smooth;
-    -webkit-text-size-adjust: 100%;
-    -webkit-tap-highlight-color: transparent;
 }}
 
 body {{
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background-color: var(--gray-50);
     color: var(--gray-900);
     line-height: 1.6;
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
     overflow-x: hidden;
 }}
 
-/* ===== TYPOGRAPHY ===== */
-h1, h2, h3, h4, h5, h6 {{
-    font-weight: 700;
-    line-height: 1.2;
-    margin-bottom: var(--space-md);
-    color: var(--gray-900);
-}}
-
-h1 {{ font-size: 2.5rem; }}
-h2 {{ font-size: 2rem; }}
-h3 {{ font-size: 1.5rem; }}
-h4 {{ font-size: 1.25rem; }}
-h5 {{ font-size: 1.125rem; }}
-h6 {{ font-size: 1rem; }}
-
-p {{
-    margin-bottom: var(--space-md);
-    color: var(--gray-700);
-}}
-
-a {{
-    color: var(--primary);
-    text-decoration: none;
-    transition: color var(--transition-fast);
-}}
-
-a:hover {{
-    color: var(--primary-dark);
-    text-decoration: underline;
-}}
-
-/* ===== LAYOUT ===== */
+/* ===== LAYOUT CONTAINER ===== */
 .container {{
     width: 100%;
     max-width: 1400px;
@@ -164,7 +96,7 @@ a:hover {{
     padding: var(--space-lg);
 }}
 
-/* ===== HEADER SECTION ===== */
+/* ===== DASHBOARD HEADER ===== */
 .dashboard-header {{
     background: linear-gradient(135deg, var(--primary) 0%, var(--info) 100%);
     color: white;
@@ -199,13 +131,15 @@ a:hover {{
     margin-bottom: var(--space-sm);
     color: white;
     font-size: 2.5rem;
+    font-weight: 800;
 }}
 
-.subtitle {{
+.header-content .subtitle {{
     font-size: 1.1rem;
-    opacity: 0.9;
+    opacity: 0.95;
     margin-bottom: var(--space-lg);
-    color: rgba(255, 255, 255, 0.95);
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 400;
 }}
 
 .header-stats {{
@@ -215,28 +149,28 @@ a:hover {{
 }}
 
 .stat-badge {{
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(10px);
     padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-full);
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: var(--space-sm);
     font-size: 0.9rem;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     color: white;
-    transition: all var(--transition-fast);
+    font-weight: 500;
 }}
 
-.stat-badge:hover {{
-    background: rgba(255, 255, 255, 0.3);
-    transform: translateY(-1px);
+.stat-badge i {{
+    font-size: 0.85rem;
+    opacity: 0.9;
 }}
 
 /* ===== STATS GRID ===== */
 .stats-grid {{
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: var(--space-lg);
     margin-bottom: var(--space-xl);
 }}
@@ -248,11 +182,12 @@ a:hover {{
     box-shadow: var(--shadow-md);
     display: flex;
     align-items: center;
-    gap: var(--space-lg);
+    gap: var(--space-md);
     transition: all var(--transition-normal);
     border: 1px solid var(--gray-200);
     position: relative;
     overflow: hidden;
+    min-height: 120px;
 }}
 
 .stat-card::before {{
@@ -262,7 +197,8 @@ a:hover {{
     left: 0;
     right: 0;
     height: 4px;
-    background: var(--gray-200);
+    background: var(--gray-300);
+    transition: background var(--transition-normal);
 }}
 
 .stat-card:hover {{
@@ -277,69 +213,81 @@ a:hover {{
 
 .stat-icon {{
     background: var(--gray-100);
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
     border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     flex-shrink: 0;
     transition: all var(--transition-normal);
+    color: var(--gray-600);
 }}
 
 .stat-card:hover .stat-icon {{
-    transform: scale(1.1);
+    transform: scale(1.05);
     box-shadow: var(--shadow-md);
 }}
 
 .stat-content {{
     flex: 1;
+    min-width: 0; /* Prevents text overflow */
 }}
 
 .stat-content h3 {{
-    font-size: 1rem;
+    font-size: 0.875rem;
     color: var(--gray-600);
-    margin-bottom: var(--space-sm);
+    margin-bottom: var(--space-xs);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }}
 
 .stat-number {{
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 800;
     margin-bottom: var(--space-xs);
     line-height: 1;
     color: var(--gray-900);
     font-feature-settings: "tnum";
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }}
 
 .stat-trend {{
-    font-size: 0.875rem;
-    color: var(--gray-600);
+    font-size: 0.8125rem;
+    color: var(--gray-500);
     display: flex;
     align-items: center;
     gap: var(--space-xs);
+    white-space: nowrap;
 }}
 
 .stat-trend i {{
     font-size: 0.75rem;
 }}
 
-/* Stat Card Color Variants */
-.card-primary::before {{ background: var(--primary); }}
-.card-success::before {{ background: var(--success); }}
-.card-warning::before {{ background: var(--warning); }}
-.card-info::before {{ background: var(--info); }}
-.card-danger::before {{ background: var(--danger); }}
-
+/* Card Color Variants */
 .card-primary .stat-icon {{ color: var(--primary); }}
+.card-primary::before {{ background: var(--primary); }}
+
 .card-success .stat-icon {{ color: var(--success); }}
+.card-success::before {{ background: var(--success); }}
+
 .card-warning .stat-icon {{ color: var(--warning); }}
+.card-warning::before {{ background: var(--warning); }}
+
 .card-info .stat-icon {{ color: var(--info); }}
+.card-info::before {{ background: var(--info); }}
+
 .card-danger .stat-icon {{ color: var(--danger); }}
+.card-danger::before {{ background: var(--danger); }}
 
 /* ===== SECTIONS ===== */
 .section {{
@@ -355,25 +303,31 @@ a:hover {{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-xl);
-    padding-bottom: var(--space-lg);
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
     border-bottom: 2px solid var(--gray-200);
     flex-wrap: wrap;
     gap: var(--space-md);
 }}
 
 .section-header h2 {{
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     display: flex;
     align-items: center;
-    gap: var(--space-md);
+    gap: var(--space-sm);
     margin: 0;
     color: var(--gray-800);
+    font-weight: 700;
 }}
 
-/* ===== BADGE LIVE ===== */
+.section-header h2 i {{
+    color: var(--primary);
+    font-size: 1.25rem;
+}}
+
+/* ===== LIVE BADGE ===== */
 .badge-live {{
-    background: var(--danger);
+    background: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%);
     color: white;
     padding: var(--space-sm) var(--space-lg);
     border-radius: var(--radius-full);
@@ -382,32 +336,37 @@ a:hover {{
     display: inline-flex;
     align-items: center;
     gap: var(--space-sm);
-    animation: pulse 2s infinite;
+    animation: pulse-live 2s infinite;
     box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    white-space: nowrap;
 }}
 
-@keyframes pulse {{
-    0% {{
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-    }}
-    70% {{
-        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
-    }}
-    100% {{
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
-    }}
+.badge-live i {{
+    font-size: 0.625rem;
+    animation: pulse-dot 1.5s infinite;
+}}
+
+@keyframes pulse-live {{
+    0% {{ box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }}
+    70% {{ box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }}
+    100% {{ box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }}
+}}
+
+@keyframes pulse-dot {{
+    0%, 100% {{ opacity: 1; }}
+    50% {{ opacity: 0.5; }}
 }}
 
 /* ===== ALERTS CONTAINER ===== */
 .alerts-container {{
     display: flex;
     flex-direction: column;
-    gap: var(--space-lg);
+    gap: var(--space-md);
 }}
 
 .alert-card {{
-    border-left: 6px solid var(--warning);
-    padding: var(--space-xl);
+    border-left: 4px solid var(--warning);
+    padding: var(--space-lg);
     background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
     border-radius: var(--radius-lg);
     border: 1px solid rgba(251, 191, 36, 0.2);
@@ -436,7 +395,7 @@ a:hover {{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
     flex-wrap: wrap;
     gap: var(--space-md);
 }}
@@ -445,11 +404,12 @@ a:hover {{
     padding: var(--space-sm) var(--space-lg);
     border-radius: var(--radius-full);
     font-weight: 700;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: var(--space-sm);
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     transition: all var(--transition-fast);
+    white-space: nowrap;
 }}
 
 .alert-badge:hover {{
@@ -480,31 +440,33 @@ a:hover {{
     gap: var(--space-sm);
     color: var(--gray-600);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
+    white-space: nowrap;
 }}
 
 .alert-content h4 {{
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     margin-bottom: var(--space-md);
     color: var(--gray-900);
     line-height: 1.3;
+    font-weight: 700;
 }}
 
 .alert-score {{
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 800;
     text-align: center;
-    margin: var(--space-lg) 0;
+    margin: var(--space-md) 0;
     color: var(--gray-900);
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
     font-feature-settings: "tnum";
     font-variant-numeric: tabular-nums;
+    line-height: 1;
 }}
 
 .alert-details {{
     display: flex;
-    gap: var(--space-xl);
-    margin-bottom: var(--space-lg);
+    gap: var(--space-lg);
+    margin-bottom: var(--space-md);
     flex-wrap: wrap;
 }}
 
@@ -514,12 +476,13 @@ a:hover {{
     gap: var(--space-sm);
     color: var(--gray-600);
     font-weight: 500;
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
+    white-space: nowrap;
 }}
 
 .detail-item i {{
     color: var(--primary);
-    font-size: 1.1rem;
+    font-size: 1rem;
 }}
 
 .alert-actions {{
@@ -531,7 +494,7 @@ a:hover {{
 /* ===== GAMES GRID ===== */
 .games-grid {{
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
     gap: var(--space-lg);
 }}
 
@@ -539,11 +502,12 @@ a:hover {{
     background: white;
     border: 1px solid var(--gray-200);
     border-radius: var(--radius-lg);
-    padding: var(--space-xl);
+    padding: var(--space-lg);
     transition: all var(--transition-normal);
     box-shadow: var(--shadow-sm);
     position: relative;
     overflow: hidden;
+    min-height: 220px;
 }}
 
 .game-card:hover {{
@@ -559,8 +523,8 @@ a:hover {{
     left: 0;
     right: 0;
     height: 4px;
-    background: var(--gray-200);
-    transition: all var(--transition-normal);
+    background: var(--gray-300);
+    transition: background var(--transition-normal);
 }}
 
 .game-card:hover::before {{
@@ -571,48 +535,51 @@ a:hover {{
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
     padding-bottom: var(--space-md);
     border-bottom: 1px solid var(--gray-200);
 }}
 
 .league-logo {{
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: var(--radius-full);
     object-fit: contain;
-    background: var(--gray-100);
-    padding: 4px;
+    background: white;
     border: 2px solid var(--gray-200);
+    padding: 2px;
+    flex-shrink: 0;
 }}
 
 .league-name {{
-    font-weight: 700;
+    font-weight: 600;
     color: var(--gray-800);
     flex: 1;
     margin-left: var(--space-md);
-    font-size: 1.1rem;
+    font-size: 1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }}
 
 .game-minute {{
     background: var(--primary);
     color: white;
-    padding: var(--space-xs) var(--space-md);
+    padding: var(--space-xs) var(--space-sm);
     border-radius: var(--radius-full);
     font-weight: 700;
-    font-size: 0.875rem;
-    min-width: 50px;
+    font-size: 0.75rem;
+    min-width: 44px;
     text-align: center;
+    flex-shrink: 0;
 }}
 
 .game-teams {{
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: var(--space-xl);
-    padding: var(--space-lg) 0;
-    border-top: 1px solid var(--gray-200);
-    border-bottom: 1px solid var(--gray-200);
+    margin-bottom: var(--space-lg);
+    padding: var(--space-md) 0;
     position: relative;
 }}
 
@@ -622,22 +589,26 @@ a:hover {{
     align-items: center;
     flex: 1;
     padding: 0 var(--space-md);
+    min-width: 0;
 }}
 
 .home-team {{ align-items: flex-start; }}
 .away-team {{ align-items: flex-end; }}
 
 .team-name {{
-    font-weight: 700;
+    font-weight: 600;
     margin-bottom: var(--space-sm);
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     color: var(--gray-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
     text-align: center;
-    line-height: 1.3;
 }}
 
 .team-score {{
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 800;
     color: var(--gray-900);
     font-feature-settings: "tnum";
@@ -646,25 +617,25 @@ a:hover {{
 }}
 
 .vs-separator {{
-    padding: 0 var(--space-lg);
     color: var(--gray-500);
     font-weight: 800;
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
     background: white;
-    padding: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-full);
     border: 2px solid var(--gray-200);
+    z-index: 1;
 }}
 
 .game-status {{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
     flex-wrap: wrap;
     gap: var(--space-md);
 }}
@@ -673,11 +644,12 @@ a:hover {{
     display: inline-flex;
     align-items: center;
     gap: var(--space-sm);
-    padding: var(--space-sm) var(--space-lg);
+    padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-full);
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     transition: all var(--transition-fast);
+    white-space: nowrap;
 }}
 
 .status-indicator:hover {{
@@ -708,19 +680,20 @@ a:hover {{
     gap: var(--space-sm);
     color: var(--gray-700);
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1rem;
+    white-space: nowrap;
 }}
 
 .game-probability i {{
     color: var(--primary);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
 }}
 
 .game-footer {{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: var(--space-lg);
+    padding-top: var(--space-md);
     border-top: 1px solid var(--gray-200);
     flex-wrap: wrap;
     gap: var(--space-md);
@@ -730,21 +703,22 @@ a:hover {{
     display: flex;
     align-items: center;
     gap: var(--space-sm);
-    color: var(--gray-600);
+    color: var(--gray-500);
     font-size: 0.875rem;
+    white-space: nowrap;
 }}
 
 /* ===== CHARTS GRID ===== */
 .charts-grid {{
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
     gap: var(--space-lg);
     margin-bottom: var(--space-xl);
 }}
 
 .chart-card {{
     background: white;
-    padding: var(--space-xl);
+    padding: var(--space-lg);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-md);
     border: 1px solid var(--gray-200);
@@ -763,18 +737,25 @@ a:hover {{
 }}
 
 .chart-header h3 {{
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     display: flex;
     align-items: center;
-    gap: var(--space-md);
+    gap: var(--space-sm);
     margin: 0;
     color: var(--gray-800);
+    font-weight: 700;
+}}
+
+.chart-header h3 i {{
+    color: var(--primary);
+    font-size: 1.1rem;
 }}
 
 .chart-container {{
     position: relative;
-    height: 300px;
+    height: 280px;
     width: 100%;
+    min-height: 280px;
 }}
 
 /* ===== FOOTER ===== */
@@ -799,7 +780,7 @@ a:hover {{
     flex-direction: column;
     gap: var(--space-sm);
     flex: 1;
-    min-width: 300px;
+    min-width: 280px;
 }}
 
 .footer-info p {{
@@ -807,17 +788,18 @@ a:hover {{
     align-items: center;
     gap: var(--space-sm);
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 0.9375rem;
+    color: var(--gray-600);
 }}
 
 .footer-info i {{
     color: var(--primary);
-    font-size: 1.1rem;
+    font-size: 1rem;
 }}
 
 .footer-links {{
     display: flex;
-    gap: var(--space-xl);
+    gap: var(--space-lg);
     flex-wrap: wrap;
 }}
 
@@ -828,10 +810,11 @@ a:hover {{
     align-items: center;
     gap: var(--space-sm);
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.9375rem;
     transition: all var(--transition-fast);
     padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-md);
+    white-space: nowrap;
 }}
 
 .footer-links a:hover {{
@@ -849,83 +832,13 @@ a:hover {{
     color: var(--gray-500);
 }}
 
-/* ===== EMPTY STATES ===== */
-.empty-state {{
-    text-align: center;
-    padding: var(--space-3xl);
-    color: var(--gray-500);
-    background: var(--gray-50);
-    border-radius: var(--radius-lg);
-    border: 2px dashed var(--gray-300);
-}}
-
-.empty-state i {{
-    font-size: 3rem;
-    margin-bottom: var(--space-lg);
-    opacity: 0.5;
-    color: var(--gray-400);
-}}
-
-.empty-state p {{
-    font-size: 1.125rem;
-    max-width: 500px;
-    margin: 0 auto var(--space-lg);
-    color: var(--gray-600);
-}}
-
-.empty-state.large {{
-    padding: var(--space-3xl);
-}}
-
-.empty-state.large i {{
-    font-size: 4rem;
-    margin-bottom: var(--space-xl);
-}}
-
-.empty-state.large h2 {{
-    font-size: 2rem;
-    margin-bottom: var(--space-lg);
-    color: var(--gray-700);
-}}
-
-.feature-list {{
-    list-style: none;
-    max-width: 400px;
-    margin: var(--space-xl) auto 0;
-    text-align: left;
-    background: white;
-    padding: var(--space-lg);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-}}
-
-.feature-list li {{
-    margin-bottom: var(--space-sm);
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    color: var(--gray-600);
-    padding: var(--space-sm);
-    border-radius: var(--radius-md);
-    transition: all var(--transition-fast);
-}}
-
-.feature-list li:hover {{
-    background: var(--gray-100);
-    transform: translateX(4px);
-}}
-
-.feature-list li i {{
-    color: var(--success);
-    font-size: 1rem;
-}}
-
 /* ===== BUTTONS ===== */
-.btn-view-all, .btn-back, .btn-export, .btn-action, .btn-details, .btn-table, .btn-league {{
+.btn-view-all, .btn-back, .btn-export, 
+.btn-action, .btn-details, .btn-table {{
     display: inline-flex;
     align-items: center;
     gap: var(--space-sm);
-    padding: var(--space-md) var(--space-lg);
+    padding: var(--space-sm) var(--space-md);
     background: var(--primary);
     color: white;
     text-decoration: none;
@@ -936,27 +849,26 @@ a:hover {{
     transition: all var(--transition-fast);
     font-size: 0.875rem;
     white-space: nowrap;
-    position: relative;
-    overflow: hidden;
     font-family: inherit;
+    line-height: 1;
 }}
 
 .btn-view-all:hover, .btn-back:hover, .btn-export:hover,
-.btn-action:hover, .btn-details:hover, .btn-table:hover, .btn-league:hover {{
+.btn-action:hover, .btn-details:hover, .btn-table:hover {{
     background: var(--primary-dark);
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
 }}
 
 .btn-view-all:active, .btn-back:active, .btn-export:active,
-.btn-action:active, .btn-details:active, .btn-table:active, .btn-league:active {{
+.btn-action:active, .btn-details:active, .btn-table:active {{
     transform: translateY(0);
     box-shadow: var(--shadow-md);
 }}
 
 .btn-view-all i, .btn-back i, .btn-export i,
 .btn-action i, .btn-details i {{
-    font-size: 0.9rem;
+    font-size: 0.875rem;
     transition: transform var(--transition-fast);
 }}
 
@@ -965,260 +877,66 @@ a:hover {{
     transform: translateX(2px);
 }}
 
-.btn-action, .btn-details {{
-    padding: var(--space-sm) var(--space-md);
-    font-size: 0.8rem;
+.btn-action {{
+    padding: var(--space-xs) var(--space-md);
+    font-size: 0.8125rem;
+    flex: 1;
+    justify-content: center;
 }}
 
 .btn-details {{
     background: var(--gray-700);
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.8125rem;
 }}
 
 .btn-details:hover {{
     background: var(--gray-800);
 }}
 
-.btn-table {{
-    padding: var(--space-xs) var(--space-sm);
-    border-radius: var(--radius-sm);
-    background: var(--gray-200);
-    color: var(--gray-700);
-}}
-
-.btn-table:hover {{
-    background: var(--gray-300);
-    color: var(--gray-900);
-}}
-
-.btn-table i {{
-    font-size: 0.8rem;
-}}
-
-/* ===== PAGE HEADERS (for other pages) ===== */
-.page-header {{
-    background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-900) 100%);
-    color: white;
-    padding: var(--space-xl);
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--space-xl);
-    box-shadow: var(--shadow-lg);
-}}
-
-.page-header h1 {{
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    color: white;
-    margin-bottom: var(--space-md);
-}}
-
-.header-actions {{
-    display: flex;
-    gap: var(--space-md);
-    flex-wrap: wrap;
-}}
-
-/* ===== TABLE CONTROLS ===== */
-.table-controls {{
-    display: flex;
-    gap: var(--space-md);
-    flex-wrap: wrap;
-}}
-
-.search-input {{
-    padding: var(--space-sm) var(--space-md);
-    border: 1px solid var(--gray-300);
-    border-radius: var(--radius-md);
-    font-size: 0.9rem;
-    min-width: 200px;
-    transition: all var(--transition-fast);
-}}
-
-.search-input:focus {{
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}}
-
-.filter-select {{
-    padding: var(--space-sm) var(--space-md);
-    border: 1px solid var(--gray-300);
-    border-radius: var(--radius-md);
-    font-size: 0.9rem;
-    background: white;
-    cursor: pointer;
-    transition: all var(--transition-fast);
-}}
-
-.filter-select:focus {{
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}}
-
-/* ===== DATA TABLE ===== */
-.table-container {{
-    overflow-x: auto;
-    margin-bottom: var(--space-lg);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--gray-200);
-    background: white;
-    box-shadow: var(--shadow-sm);
-}}
-
-.data-table {{
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 800px;
-}}
-
-.data-table th {{
-    background: var(--gray-50);
-    padding: var(--space-md);
-    text-align: left;
-    font-weight: 700;
-    color: var(--gray-700);
-    border-bottom: 2px solid var(--gray-300);
-    position: sticky;
-    top: 0;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-}}
-
-.data-table td {{
-    padding: var(--space-md);
-    border-bottom: 1px solid var(--gray-200);
-    vertical-align: middle;
-    font-size: 0.95rem;
-    color: var(--gray-700);
-}}
-
-.data-table tr {{
-    transition: all var(--transition-fast);
-}}
-
-.data-table tr:hover {{
-    background: rgba(59, 130, 246, 0.05);
-}}
-
-.data-table tr:last-child td {{
-    border-bottom: none;
-}}
-
-/* Table Badges */
-.data-table .badge {{
-    padding: var(--space-xs) var(--space-md);
-    border-radius: var(--radius-full);
-    font-size: 0.75rem;
-    font-weight: 700;
-    display: inline-block;
+/* ===== EMPTY STATES ===== */
+.empty-state {{
     text-align: center;
-    min-width: 70px;
+    padding: var(--space-2xl);
+    color: var(--gray-500);
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    border: 2px dashed var(--gray-300);
 }}
 
-.badge-success {{ background: var(--success); color: white; }}
-.badge-warning {{ background: var(--warning); color: var(--gray-900); }}
-.badge-secondary {{ background: var(--secondary); color: white; }}
-
-/* Probability Bar */
-.probability-bar {{
-    position: relative;
-    background: var(--gray-200);
-    border-radius: var(--radius-full);
-    height: 24px;
-    overflow: hidden;
-    min-width: 100px;
+.empty-state i {{
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+    opacity: 0.5;
+    color: var(--gray-400);
 }}
 
-.bar-fill {{
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    background: linear-gradient(90deg, var(--success), var(--success-dark));
-    border-radius: var(--radius-full);
-    transition: width 1s ease;
-}}
-
-.probability-bar span {{
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: var(--gray-900);
-    font-weight: 700;
-    font-size: 0.8rem;
-    z-index: 1;
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
-}}
-
-/* ===== PAGINATION ===== */
-.pagination {{
-    display: flex;
-    justify-content: center;
-    gap: var(--space-sm);
-    margin-top: var(--space-xl);
-    flex-wrap: wrap;
-}}
-
-.page-btn {{
-    padding: var(--space-sm) var(--space-md);
-    background: white;
-    border: 1px solid var(--gray-300);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: all var(--transition-fast);
-    font-size: 0.9rem;
+.empty-state p {{
+    font-size: 1rem;
+    margin: 0;
+    color: var(--gray-600);
     font-weight: 500;
-    color: var(--gray-700);
-    min-width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }}
 
-.page-btn:hover {{
-    background: var(--gray-100);
-    border-color: var(--gray-400);
-    color: var(--gray-900);
-}}
+/* ===== RESPONSIVE DESIGN ===== */
 
-.page-btn.active {{
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
-    font-weight: 700;
-}}
-
-/* ===== RESPONSIVE DESIGN - MOBILE FIRST ===== */
-
-/* Extra Small Devices (Phones, < 576px) */
-@media (max-width: 575.98px) {{
-    html {{ font-size: 14px; }}
+/* Mobile (up to 576px) */
+@media (max-width: 576px) {{
+    html {{ font-size: 15px; }}
     
     .container {{
         padding: var(--space-md);
     }}
     
-    h1 {{ font-size: 2rem; }}
-    h2 {{ font-size: 1.75rem; }}
-    h3 {{ font-size: 1.25rem; }}
-    
     .dashboard-header {{
         padding: var(--space-lg);
         text-align: center;
-        border-radius: var(--radius-md);
     }}
     
     .header-content h1 {{
+        font-size: 1.75rem;
         justify-content: center;
-        flex-direction: column;
-        gap: var(--space-sm);
-        font-size: 2rem;
-        text-align: center;
+        flex-wrap: wrap;
     }}
     
     .header-stats {{
@@ -1231,35 +949,35 @@ a:hover {{
     }}
     
     .stat-card {{
+        padding: var(--space-md);
         flex-direction: column;
         text-align: center;
-        padding: var(--space-lg);
+        min-height: auto;
     }}
     
     .stat-icon {{
-        width: 60px;
-        height: 60px;
-        font-size: 1.5rem;
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
     }}
     
     .stat-number {{
-        font-size: 2rem;
+        font-size: 1.75rem;
     }}
     
     .section {{
         padding: var(--space-lg);
-        border-radius: var(--radius-md);
     }}
     
     .section-header {{
         flex-direction: column;
         align-items: stretch;
-        gap: var(--space-md);
         text-align: center;
+        gap: var(--space-md);
     }}
     
     .section-header h2 {{
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         justify-content: center;
     }}
     
@@ -1269,19 +987,21 @@ a:hover {{
     }}
     
     .game-card {{
-        padding: var(--space-lg);
+        padding: var(--space-md);
     }}
     
     .game-teams {{
         flex-direction: column;
         gap: var(--space-md);
-        text-align: center;
     }}
     
     .home-team, .away-team {{
         align-items: center;
         text-align: center;
-        width: 100%;
+    }}
+    
+    .team-score {{
+        font-size: 2rem;
     }}
     
     .vs-separator {{
@@ -1293,13 +1013,8 @@ a:hover {{
         margin-bottom: var(--space-md);
     }}
     
-    .team-score {{
-        font-size: 2.5rem;
-    }}
-    
     .game-status {{
         flex-direction: column;
-        align-items: stretch;
         gap: var(--space-md);
         text-align: center;
     }}
@@ -1311,8 +1026,8 @@ a:hover {{
     
     .game-footer {{
         flex-direction: column;
-        gap: var(--space-md);
         text-align: center;
+        gap: var(--space-md);
     }}
     
     .charts-grid {{
@@ -1321,42 +1036,29 @@ a:hover {{
     }}
     
     .chart-card {{
-        padding: var(--space-lg);
+        padding: var(--space-md);
         min-width: 100%;
     }}
     
     .chart-container {{
-        height: 250px;
+        height: 240px;
     }}
     
     .alert-header {{
         flex-direction: column;
-        align-items: stretch;
-        gap: var(--space-md);
         text-align: center;
-    }}
-    
-    .alert-badge {{
-        justify-content: center;
+        gap: var(--space-md);
     }}
     
     .alert-details {{
         flex-direction: column;
-        gap: var(--space-md);
         text-align: center;
-    }}
-    
-    .detail-item {{
-        justify-content: center;
+        gap: var(--space-md);
     }}
     
     .alert-actions {{
         flex-direction: column;
-    }}
-    
-    .btn-action {{
-        width: 100%;
-        justify-content: center;
+        gap: var(--space-sm);
     }}
     
     .footer-content {{
@@ -1372,54 +1074,13 @@ a:hover {{
     
     .footer-links {{
         flex-direction: column;
+        width: 100%;
         gap: var(--space-md);
-        width: 100%;
-    }}
-    
-    .footer-links a {{
-        justify-content: center;
-        width: 100%;
-    }}
-    
-    /* Table Responsive */
-    .table-container {{
-        border-radius: var(--radius-md);
-    }}
-    
-    .data-table th,
-    .data-table td {{
-        padding: var(--space-sm);
-        font-size: 0.85rem;
-    }}
-    
-    .probability-bar {{
-        height: 20px;
-        min-width: 80px;
-    }}
-    
-    .probability-bar span {{
-        font-size: 0.7rem;
-    }}
-    
-    .empty-state {{
-        padding: var(--space-xl);
-    }}
-    
-    .empty-state.large {{
-        padding: var(--space-xl);
-    }}
-    
-    .empty-state.large i {{
-        font-size: 3rem;
     }}
 }}
 
-/* Small Devices (Tablets, 576px - 767px) */
-@media (min-width: 576px) and (max-width: 767.98px) {{
-    .container {{
-        padding: var(--space-lg);
-    }}
-    
+/* Tablet (577px - 768px) */
+@media (min-width: 577px) and (max-width: 768px) {{
     .stats-grid {{
         grid-template-columns: repeat(2, 1fr);
     }}
@@ -1432,33 +1093,15 @@ a:hover {{
         grid-template-columns: 1fr;
     }}
     
-    .chart-card {{
-        min-width: 100%;
-    }}
-    
     .section-header {{
         flex-direction: column;
         align-items: flex-start;
         gap: var(--space-md);
     }}
-    
-    .alert-header {{
-        flex-direction: row;
-        justify-content: space-between;
-    }}
-    
-    .footer-content {{
-        flex-direction: row;
-        justify-content: space-between;
-    }}
 }}
 
-/* Medium Devices (Tablets, 768px - 991px) */
-@media (min-width: 768px) and (max-width: 991.98px) {{
-    .stats-grid {{
-        grid-template-columns: repeat(2, 1fr);
-    }}
-    
+/* Small Desktop (769px - 992px) */
+@media (min-width: 769px) and (max-width: 992px) {{
     .games-grid {{
         grid-template-columns: repeat(2, 1fr);
     }}
@@ -1466,18 +1109,17 @@ a:hover {{
     .charts-grid {{
         grid-template-columns: repeat(2, 1fr);
     }}
-    
-    .chart-card {{
-        min-width: 100%;
+}}
+
+/* Large Desktop (993px - 1200px) */
+@media (min-width: 993px) and (max-width: 1200px) {{
+    .games-grid {{
+        grid-template-columns: repeat(3, 1fr);
     }}
 }}
 
-/* Large Devices (Desktops, 992px - 1199px) */
-@media (min-width: 992px) and (max-width: 1199.98px) {{
-    .stats-grid {{
-        grid-template-columns: repeat(4, 1fr);
-    }}
-    
+/* Extra Large Desktop (1201px+) */
+@media (min-width: 1201px) {{
     .games-grid {{
         grid-template-columns: repeat(3, 1fr);
     }}
@@ -1487,22 +1129,7 @@ a:hover {{
     }}
 }}
 
-/* Extra Large Devices (Large Desktops, 1200px and up) */
-@media (min-width: 1200px) {{
-    .stats-grid {{
-        grid-template-columns: repeat(4, 1fr);
-    }}
-    
-    .games-grid {{
-        grid-template-columns: repeat(3, 1fr);
-    }}
-    
-    .charts-grid {{
-        grid-template-columns: repeat(2, 1fr);
-    }}
-}}
-
-/* Ultra Wide Screens (1920px and up) */
+/* Ultra Wide (1920px+) */
 @media (min-width: 1920px) {{
     .container {{
         max-width: 1800px;
@@ -1516,62 +1143,11 @@ a:hover {{
         grid-template-columns: repeat(3, 1fr);
     }}
 }}
-
-/* Print Styles */
-@media print {{
-    .dashboard-header {{
-        background: white !important;
-        color: black !important;
-        box-shadow: none !important;
-        border: 2px solid var(--gray-300);
-    }}
-    
-    .stat-card, .section, .chart-card {{
-        box-shadow: none !important;
-        border: 1px solid var(--gray-300) !important;
-        break-inside: avoid;
-    }}
-    
-    .btn-view-all, .btn-back, .btn-export, 
-    .btn-action, .btn-details, .btn-table {{
-        display: none !important;
-    }}
-    
-    .dashboard-footer {{
-        display: none !important;
-    }}
-    
-    .games-grid {{
-        grid-template-columns: repeat(2, 1fr) !important;
-    }}
-    
-    body::after {{
-        display: none !important;
-    }}
-    
-    @page {{
-        margin: 1cm;
-    }}
-}}
 """
-        
-        css_path = css_dir / "style.css"
-        with open(css_path, 'w', encoding='utf-8') as f:
-            f.write(css_content)
-        
-        logger.info(f"✅ COMPLETE CSS stylesheet saved to: {css_path}")
-        
-        # Verify file creation
-        if css_path.exists():
-            file_size = css_path.stat().st_size
-            logger.info(f"✅ CSS file size: {file_size:,} bytes")
-            print(f"✅ COMPLETE CSS generated successfully!")
-            print(f"📁 Location: {css_path}")
-            print(f"📏 Size: {file_size:,} bytes")
-            print(f"🎨 Colors: {len(self.colors)} custom colors")
-            print(f"📱 Mobile: Fully responsive (5 breakpoints)")
-        else:
-            logger.error("❌ CSS file was not created!")
-            print("❌ ERROR: CSS file was not created!")
-        
-        return css_path
+    
+    css_path = css_dir / "style.css"
+    with open(css_path, 'w', encoding='utf-8') as f:
+        f.write(css_content)
+    
+    logger.info(f"✅ PERFECT CSS generated: {css_path}")
+    return css_path
