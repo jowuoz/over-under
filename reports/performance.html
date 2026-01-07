@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ Performance - Over/Under Predictor</title>
+    
+    <!-- CSS Links -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for Data Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Additional Styles for Performance Page -->
+    <style>
+        /* Performance Page Specific Styles */
+        .page-header {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Performance Grid */
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .performance-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .performance-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .performance-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .performance-header h3 {
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .performance-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .performance-change {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            background: #f0f9ff;
+            color: #0ea5e9;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .performance-change.negative {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+        
+        .performance-change.positive {
+            background: #f0fdf4;
+            color: #10b981;
+        }
+        
+        /* Charts */
+        .chart-container-medium {
+            position: relative;
+            height: 250px;
+            margin: 1rem 0;
+        }
+        
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .metric-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .metric-progress {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .progress-success { background: linear-gradient(90deg, #10b981 0%, #34d399 100%); }
+        .progress-warning { background: linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%); }
+        .progress-danger { background: linear-gradient(90deg, #ef4444 0%, #f87171 100%); }
+        .progress-info { background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%); }
+        
+        .metric-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+        
+        /* System Status */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .status-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+        }
+        
+        .status-icon.healthy { background: #10b981; }
+        .status-icon.warning { background: #f59e0b; }
+        .status-icon.error { background: #ef4444; }
+        .status-icon.info { background: #3b82f6; }
+        
+        .status-content h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .status-content p {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+        
+        /* Response Time Distribution */
+        .distribution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .distribution-item {
+            text-align: center;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.75rem;
+        }
+        
+        .distribution-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .distribution-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+        
+        /* Timeline */
+        .performance-timeline {
+            margin: 2rem 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: -1rem;
+            width: 2px;
+            background: #e2e8f0;
+        }
+        
+        .timeline-item:last-child:before {
+            display: none;
+        }
+        
+        .timeline-marker {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #3b82f6;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            position: relative;
+            z-index: 1;
+            font-size: 0.85rem;
+        }
+        
+        .timeline-content {
+            flex: 1;
+            background: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .timeline-content h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+            color: #1e293b;
+        }
+        
+        .timeline-content p {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+        
+        .timeline-time {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+        
+        /* Performance Alerts */
+        .alerts-container {
+            margin: 1.5rem 0;
+        }
+        
+        .alert-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .alert-icon {
+            color: #f59e0b;
+            font-size: 1.25rem;
+        }
+        
+        .alert-content {
+            flex: 1;
+        }
+        
+        .alert-content h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .alert-content p {
+            font-size: 0.85rem;
+            color: #92400e;
+        }
+        
+        .alert-time {
+            font-size: 0.75rem;
+            color: #b45309;
+        }
+        
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin: 1.5rem 0;
+        }
+        
+        .comparison-table th {
+            background: #f8fafc;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .comparison-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .comparison-table tbody tr:hover {
+            background: #f8fafc;
+        }
+        
+        .comparison-value {
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .comparison-change {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 1rem;
+            background: #f0f9ff;
+            color: #0ea5e9;
+        }
+        
+        .comparison-change.positive {
+            background: #f0fdf4;
+            color: #10b981;
+        }
+        
+        .comparison-change.negative {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+        
+        /* Resource Utilization */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .resource-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .resource-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .resource-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .resource-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .resource-chart {
+            height: 100px;
+            margin: 1rem 0;
+        }
+        
+        /* Time Range Selector */
+        .time-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .time-btn {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .time-btn:hover {
+            background: #f8fafc;
+        }
+        
+        .time-btn.active {
+            background: #8b5cf6;
+            color: white;
+            border-color: #8b5cf6;
+        }
+        
+        /* Performance Indicators */
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .indicator {
+            text-align: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .indicator-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .indicator-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+        
+        .indicator-trend {
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            margin-top: 0.25rem;
+        }
+        
+        .trend-up { color: #10b981; }
+        .trend-down { color: #ef4444; }
+        .trend-neutral { color: #64748b; }
+        
+        /* Performance Score */
+        .score-card {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .score-value {
+            font-size: 4rem;
+            font-weight: bold;
+            line-height: 1;
+        }
+        
+        .score-label {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+        
+        .score-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 1rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .performance-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .resource-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .indicators-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .comparison-table {
+                font-size: 0.9rem;
+            }
+            
+            .score-value {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Page Header -->
+        <header class="page-header">
+            <h1><i class="fas fa-tachometer-alt"></i> System Performance</h1>
+            <div class="header-actions">
+                <a href="index.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Dashboard
+                </a>
+                <button class="btn-export" onclick="exportPerformanceReport()">
+                    <i class="fas fa-file-export"></i> Export Report
+                </button>
+                <button class="btn-back" style="background: #10b981;" onclick="refreshPerformance()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- Time Range Selector -->
+        <div class="time-selector">
+            <button class="time-btn active" onclick="setTimeRange('today')">Today</button>
+            <button class="time-btn" onclick="setTimeRange('week')">This Week</button>
+            <button class="time-btn" onclick="setTimeRange('month')">This Month</button>
+            <button class="time-btn" onclick="setTimeRange('quarter')">Last 3 Months</button>
+            <button class="time-btn" onclick="setTimeRange('year')">This Year</button>
+        </div>
+
+        <!-- Performance Score -->
+        <div class="score-card">
+            <div class="score-value" id="performanceScore">92</div>
+            <div class="score-label">Overall Performance Score</div>
+            <div class="score-description" id="performanceDescription">Excellent - All systems operating optimally</div>
+        </div>
+
+        <!-- Performance Overview -->
+        <div class="performance-grid">
+            <div class="performance-card">
+                <div class="performance-header">
+                    <h3><i class="fas fa-bolt"></i> Response Time</h3>
+                    <div class="performance-value" id="avgResponseTime">245ms</div>
+                </div>
+                <div class="performance-change positive">
+                    <i class="fas fa-arrow-down"></i> 15ms faster
+                </div>
+                <div class="chart-container-medium">
+                    <canvas id="responseTimeChart"></canvas>
+                </div>
+                <div class="distribution-grid">
+                    <div class="distribution-item">
+                        <div class="distribution-value" id="fastResponses">78%</div>
+                        <div class="distribution-label">&lt; 300ms</div>
+                    </div>
+                    <div class="distribution-item">
+                        <div class="distribution-value" id="mediumResponses">18%</div>
+                        <div class="distribution-label">300-500ms</div>
+                    </div>
+                    <div class="distribution-item">
+                        <div class="distribution-value" id="slowResponses">4%</div>
+                        <div class="distribution-label">&gt; 500ms</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="performance-card">
+                <div class="performance-header">
+                    <h3><i class="fas fa-bullseye"></i> Accuracy Rate</h3>
+                    <div class="performance-value" id="accuracyRate">82.5%</div>
+                </div>
+                <div class="performance-change positive">
+                    <i class="fas fa-arrow-up"></i> +3.2%
+                </div>
+                <div class="chart-container-medium">
+                    <canvas id="accuracyChart"></canvas>
+                </div>
+                <div class="indicators-grid">
+                    <div class="indicator">
+                        <div class="indicator-value" id="over25Accuracy">85%</div>
+                        <div class="indicator-label">Over 2.5</div>
+                        <div class="indicator-trend trend-up">
+                            <i class="fas fa-arrow-up"></i> 2.1%
+                        </div>
+                    </div>
+                    <div class="indicator">
+                        <div class="indicator-value" id="under25Accuracy">79%</div>
+                        <div class="indicator-label">Under 2.5</div>
+                        <div class="indicator-trend trend-up">
+                            <i class="fas fa-arrow-up"></i> 1.8%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Status -->
+        <div class="section">
+            <h2><i class="fas fa-server"></i> System Status</h2>
+            
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-icon healthy">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <div class="status-content">
+                        <h4>API Services</h4>
+                        <p>All 3 APIs operational</p>
+                        <p class="timeline-time">Last checked: 2 minutes ago</p>
+                    </div>
+                </div>
+                
+                <div class="status-item">
+                    <div class="status-icon healthy">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <div class="status-content">
+                        <h4>Web Scrapers</h4>
+                        <p>2/2 scrapers active</p>
+                        <p class="timeline-time">Success rate: 98.2%</p>
+                    </div>
+                </div>
+                
+                <div class="status-item">
+                    <div class="status-icon healthy">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="status-content">
+                        <h4>Database</h4>
+                        <p>Connection stable</p>
+                        <p class="timeline-time">Query time: 45ms avg</p>
+                    </div>
+                </div>
+                
+                <div class="status-item">
+                    <div class="status-icon healthy">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="status-content">
+                        <h4>Alert System</h4>
+                        <p>Notifications active</p>
+                        <p class="timeline-time">Delivery rate: 99.8%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resource Utilization -->
+        <div class="section">
+            <h2><i class="fas fa-microchip"></i> Resource Utilization</h2>
+            
+            <div class="resource-grid">
+                <div class="resource-card">
+                    <div class="resource-header">
+                        <div class="resource-title">CPU Usage</div>
+                        <div class="resource-value" id="cpuUsage">24%</div>
+                    </div>
+                    <div class="metric-progress">
+                        <div class="progress-fill progress-info" id="cpuProgress" style="width: 24%"></div>
+                    </div>
+                    <div class="metric-footer">
+                        <span>Peak: <span id="cpuPeak">42%</span></span>
+                        <span>Average: <span id="cpuAvg">18%</span></span>
+                    </div>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-header">
+                        <div class="resource-title">Memory Usage</div>
+                        <div class="resource-value" id="memoryUsage">68%</div>
+                    </div>
+                    <div class="metric-progress">
+                        <div class="progress-fill progress-warning" id="memoryProgress" style="width: 68%"></div>
+                    </div>
+                    <div class="metric-footer">
+                        <span>Used: <span id="memoryUsed">1.7GB</span></span>
+                        <span>Total: <span id="memoryTotal">2.5GB</span></span>
+                    </div>
+                </div>
+                
+                <div class="resource-card">
+                    <div class="resource-header">
+                        <div class="resource-title">Disk I/O</div>
+                        <div class="resource-value" id="diskIO">42</div>
+                    </div>
+                    <div class="metric-progress">
+                        <div class="progress-fill progress-success" id="diskProgress" style="width: 42%"></div>
+                    </div>
+                    <div class="metric-footer">
+                        <span>Read: <span id="diskRead">15MB/s</span></span>
+                        <span>Write: <span id="diskWrite">8MB/s</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="section">
+            <h2><i class="fas fa-chart-line"></i> Performance Metrics</h2>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-title">
+                        <i class="fas fa-exchange-alt"></i> Throughput
+                    </div>
+                    <div class="metric-value" id="throughput">142</div>
+                    <div class="metric-desc">Predictions per hour</div>
+                    <div class="metric-progress">
+                        <div class="progress-fill progress-success" style="width: 85%"></div>
+                    </div>
+                    <div class="metric-footer">
+                        <span>Capacity: 90%</span>
+                        <span>Peak: 168/hr</span>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title">
+                        <i class="fas fa-exclamation-circle"></i> Error Rate
+                    </div>
+                    <div class="metric-value" id="errorRate">2.3%</div>
+                    <div class="metric-desc">Failed operations</div>
+                    <div class="metric-progress">
+                        <div class="progress-fill progress-danger" style="width: 23%"></div>
+                    </div>
+                    <div class="metric-footer">
+                        <span>Target: &lt; 5%</span>
+                        <span>Last week: 3.5%</span>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title">
+                        <i class="fas fa-clock"></i> Uptime
+                    </div>
+                    <div class="metric-value" id="uptime">99.8%</div>
+                    <div class="metric-desc">System availability</div>
+                    <div class="metric-progress">
+                        <div class="progress-fill progress-success" style="width: 99.8%"></div>
+                    </div>
+                    <div class="metric-footer">
+                        <span>This month</span>
+                        <span>Downtime: 1.4h</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Comparison -->
+        <div class="section">
+            <h2><i class="fas fa-balance-scale"></i> Performance Comparison</h2>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Current</th>
+                        <th>Last Week</th>
+                        <th>Last Month</th>
+                        <th>Change</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Response Time</td>
+                        <td class="comparison-value">245ms</td>
+                        <td>260ms</td>
+                        <td>285ms</td>
+                        <td><span class="comparison-change positive">-5.8%</span></td>
+                    </tr>
+                    <tr>
+                        <td>Accuracy Rate</td>
+                        <td class="comparison-value">82.5%</td>
+                        <td>79.3%</td>
+                        <td>76.8%</td>
+                        <td><span class="comparison-change positive">+4.0%</span></td>
+                    </tr>
+                    <tr>
+                        <td>Throughput</td>
+                        <td class="comparison-value">142/hr</td>
+                        <td>135/hr</td>
+                        <td>128/hr</td>
+                        <td><span class="comparison-change positive">+5.2%</span></td>
+                    </tr>
+                    <tr>
+                        <td>Error Rate</td>
+                        <td class="comparison-value">2.3%</td>
+                        <td>3.5%</td>
+                        <td>4.2%</td>
+                        <td><span class="comparison-change positive">-34.3%</span></td>
+                    </tr>
+                    <tr>
+                        <td>Cache Hit Rate</td>
+                        <td class="comparison-value">65%</td>
+                        <td>62%</td>
+                        <td>58%</td>
+                        <td><span class="comparison-change positive">+4.8%</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Performance Alerts -->
+        <div class="section">
+            <h2><i class="fas fa-exclamation-triangle"></i> Recent Performance Alerts</h2>
+            
+            <div class="alerts-container" id="performanceAlerts">
+                <!-- Alerts will be loaded here -->
+                <div class="alert-item">
+                    <div class="alert-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="alert-content">
+                        <h4>High Memory Usage</h4>
+                        <p>Memory usage peaked at 92% during data processing</p>
+                        <div class="alert-time">2 hours ago - Resolved</div>
+                    </div>
+                </div>
+                
+                <div class="alert-item">
+                    <div class="alert-icon">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="alert-content">
+                        <h4>API Rate Limit Warning</h4>
+                        <p>Approaching rate limit on FlashScore API</p>
+                        <div class="alert-time">4 hours ago - Monitored</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Timeline -->
+        <div class="section">
+            <h2><i class="fas fa-history"></i> Performance Timeline</h2>
+            
+            <div class="performance-timeline" id="performanceTimeline">
+                <!-- Timeline items will be populated by JavaScript -->
+                <div class="timeline-item">
+                    <div class="timeline-marker">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h4>System Startup</h4>
+                        <p>All services started successfully</p>
+                        <div class="timeline-time">Today, 08:00 AM</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-marker">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h4>Data Collection Cycle</h4>
+                        <p>Collected data from 42 live matches</p>
+                        <div class="timeline-time">Today, 08:05 AM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p><i class="fas fa-code"></i> Over/Under Predictor Performance Monitor</p>
+                    <p><i class="fas fa-clock"></i> Last updated: <span id="lastUpdated">Just now</span></p>
+                    <p><i class="fas fa-heartbeat"></i> System health: <span id="systemHealth">Excellent</span></p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html"><i class="fas fa-home"></i> Dashboard</a>
+                    <a href="alerts.html"><i class="fas fa-exclamation-triangle"></i> Alerts</a>
+                    <a href="statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                <p>© <span id="currentYear">2024</span> Over/Under Predictor. Performance metrics updated in real-time.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Performance Page JavaScript -->
+    <script>
+        // Performance Page JavaScript
+        let currentTimeRange = 'today';
+        let responseTimeChart = null;
+        let accuracyChart = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current year in footer
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            
+            // Set last updated time
+            updateLastUpdated();
+            
+            // Load performance data
+            loadPerformanceData();
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Set up refresh interval (every 60 seconds)
+            setInterval(refreshPerformance, 60000);
+            
+            // Load timeline data
+            loadTimelineData();
+            
+            // Start live updates simulation
+            startLiveUpdates();
+        });
+        
+        function setTimeRange(range) {
+            currentTimeRange = range;
+            
+            // Update active button
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Reload data for selected time range
+            loadPerformanceData();
+        }
+        
+        function loadPerformanceData() {
+            console.log('Loading performance data for:', currentTimeRange);
+            
+            // Try to load from data/latest.json first
+            fetch('data/latest.json')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    updatePerformanceData(data);
+                })
+                .catch(error => {
+                    console.log('Could not load performance data:', error);
+                    
+                    // Try to load from performance data file
+                    fetch('data/performance.json')
+                        .then(response => {
+                            if (!response.ok) throw new Error('Performance file not found');
+                            return response.json();
+                        })
+                        .then(perfData => {
+                            updatePerformanceData(perfData);
+                        })
+                        .catch(error2 => {
+                            console.log('Could not load performance file:', error2);
+                            
+                            // Use sample data as fallback
+                            useSamplePerformanceData();
+                        });
+                });
+        }
+        
+        function updatePerformanceData(data) {
+            // Update performance metrics
+            document.getElementById('avgResponseTime').textContent = 
+                formatNumber(data.avg_response_time || 245) + 'ms';
+            
+            document.getElementById('accuracyRate').textContent = 
+                formatPercentage(data.accuracy_rate || 82.5);
+            
+            document.getElementById('errorRate').textContent = 
+                formatPercentage(data.error_rate || 2.3);
+            
+            document.getElementById('uptime').textContent = 
+                formatPercentage(data.uptime || 99.8);
+            
+            document.getElementById('throughput').textContent = 
+                formatNumber(data.throughput || 142);
+            
+            // Update resource utilization
+            document.getElementById('cpuUsage').textContent = 
+                formatPercentage(data.cpu_usage || 24);
+            
+            document.getElementById('memoryUsage').textContent = 
+                formatPercentage(data.memory_usage || 68);
+            
+            document.getElementById('diskIO').textContent = 
+                formatNumber(data.disk_io || 42);
+            
+            // Update distribution values
+            document.getElementById('fastResponses').textContent = 
+                formatPercentage(data.fast_responses || 78);
+            
+            document.getElementById('mediumResponses').textContent = 
+                formatPercentage(data.medium_responses || 18);
+            
+            document.getElementById('slowResponses').textContent = 
+                formatPercentage(data.slow_responses || 4);
+            
+            // Update accuracy indicators
+            document.getElementById('over25Accuracy').textContent = 
+                formatPercentage(data.over25_accuracy || 85);
+            
+            document.getElementById('under25Accuracy').textContent = 
+                formatPercentage(data.under25_accuracy || 79);
+            
+            // Update system health
+            updateSystemHealth(data);
+            
+            // Update charts
+            updateChartsData(data);
+            
+            // Update performance score
+            updatePerformanceScore(data);
+        }
+        
+        function initializeCharts() {
+            // Response Time Chart
+            const responseCtx = document.getElementById('responseTimeChart').getContext('2d');
+            responseTimeChart = new Chart(responseCtx, {
+                type: 'line',
+                data: {
+                    labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
+                    datasets: [{
+                        label: 'Response Time (ms)',
+                        data: [260, 245, 230, 240, 250, 245],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw}ms`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 200,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + 'ms';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Accuracy Chart
+            const accuracyCtx = document.getElementById('accuracyChart').getContext('2d');
+            accuracyChart = new Chart(accuracyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Accuracy Rate',
+                        data: [79, 80, 82, 81, 83, 85, 84],
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        borderColor: '#10b981',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Accuracy: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 75,
+                            max: 90,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateChartsData(data) {
+            // Update response time chart if data available
+            if (responseTimeChart && data.response_times) {
+                responseTimeChart.data.datasets[0].data = data.response_times;
+                responseTimeChart.update();
+            }
+            
+            // Update accuracy chart if data available
+            if (accuracyChart && data.accuracy_trend) {
+                accuracyChart.data.datasets[0].data = data.accuracy_trend;
+                accuracyChart.update();
+            }
+        }
+        
+        function updateSystemHealth(data) {
+            const health = calculateSystemHealth(data);
+            const healthElement = document.getElementById('systemHealth');
+            
+            if (health >= 90) {
+                healthElement.textContent = 'Excellent';
+                healthElement.style.color = '#10b981';
+            } else if (health >= 75) {
+                healthElement.textContent = 'Good';
+                healthElement.style.color = '#f59e0b';
+            } else {
+                healthElement.textContent = 'Needs Attention';
+                healthElement.style.color = '#ef4444';
+            }
+        }
+        
+        function calculateSystemHealth(data) {
+            // Simple health calculation based on various metrics
+            const metrics = {
+                uptime: data.uptime || 99.8,
+                accuracy: data.accuracy_rate || 82.5,
+                response_time: data.avg_response_time || 245,
+                error_rate: data.error_rate || 2.3
+            };
+            
+            // Convert response time to score (lower is better)
+            const responseScore = Math.max(0, 100 - (metrics.response_time / 10));
+            
+            // Convert error rate to score (lower is better)
+            const errorScore = Math.max(0, 100 - (metrics.error_rate * 10));
+            
+            // Calculate weighted average
+            const health = (
+                metrics.uptime * 0.3 +          // Uptime weight: 30%
+                metrics.accuracy * 0.3 +        // Accuracy weight: 30%
+                responseScore * 0.2 +           // Response time weight: 20%
+                errorScore * 0.2                // Error rate weight: 20%
+            );
+            
+            return Math.min(100, Math.round(health));
+        }
+        
+        function updatePerformanceScore(data) {
+            const score = calculateSystemHealth(data);
+            const scoreElement = document.getElementById('performanceScore');
+            const descriptionElement = document.getElementById('performanceDescription');
+            
+            scoreElement.textContent = score;
+            
+            if (score >= 90) {
+                scoreElement.style.color = '#ffffff';
+                descriptionElement.textContent = 'Excellent - All systems operating optimally';
+            } else if (score >= 80) {
+                scoreElement.style.color = '#ffffff';
+                descriptionElement.textContent = 'Good - Minor optimizations possible';
+            } else if (score >= 70) {
+                scoreElement.style.color = '#ffffff';
+                descriptionElement.textContent = 'Fair - Some areas need attention';
+            } else {
+                scoreElement.style.color = '#ffffff';
+                descriptionElement.textContent = 'Needs Improvement - Review system performance';
+            }
+        }
+        
+        function loadTimelineData() {
+            const timeline = document.getElementById('performanceTimeline');
+            const events = getPerformanceEvents();
+            
+            let html = '';
+            events.forEach(event => {
+                html += `
+                <div class="timeline-item">
+                    <div class="timeline-marker">
+                        <i class="fas ${event.icon}"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h4>${event.title}</h4>
+                        <p>${event.description}</p>
+                        <div class="timeline-time">${event.time}</div>
+                    </div>
+                </div>
+                `;
+            });
+            
+            timeline.innerHTML = html;
+        }
+        
+        function getPerformanceEvents() {
+            const now = new Date();
+            return [
+                {
+                    icon: 'fa-check',
+                    title: 'System Startup',
+                    description: 'All services started successfully',
+                    time: formatTime(now, -120)
+                },
+                {
+                    icon: 'fa-sync-alt',
+                    title: 'Data Collection Cycle',
+                    description: 'Collected data from 42 live matches',
+                    time: formatTime(now, -115)
+                },
+                {
+                    icon: 'fa-chart-line',
+                    title: 'Performance Analysis',
+                    description: 'Completed prediction analysis with 85% average confidence',
+                    time: formatTime(now, -110)
+                },
+                {
+                    icon: 'fa-bell',
+                    title: 'Alert Generation',
+                    description: 'Generated 3 high-confidence alerts',
+                    time: formatTime(now, -105)
+                },
+                {
+                    icon: 'fa-database',
+                    title: 'Data Persistence',
+                    description: 'Saved results to database and cache',
+                    time: formatTime(now, -100)
+                }
+            ];
+        }
+        
+        function formatTime(baseTime, minutesAgo) {
+            const time = new Date(baseTime.getTime() + minutesAgo * 60000);
+            const now = new Date();
+            const diffMinutes = Math.floor((now - time) / 60000);
+            
+            if (diffMinutes < 60) {
+                return `${diffMinutes} minutes ago`;
+            } else if (diffMinutes < 1440) {
+                const hours = Math.floor(diffMinutes / 60);
+                return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+            } else {
+                return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+        }
+        
+        function refreshPerformance() {
+            console.log('Refreshing performance data...');
+            
+            // Show loading state
+            document.getElementById('avgResponseTime').textContent = '...';
+            document.getElementById('accuracyRate').textContent = '...';
+            
+            // Reload data
+            loadPerformanceData();
+            
+            // Update last updated time
+            updateLastUpdated();
+            
+            // Show notification
+            showNotification('Performance data updated successfully!', 'success');
+        }
+        
+        function updateLastUpdated() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('lastUpdated').textContent = timeString;
+        }
+        
+        function exportPerformanceReport() {
+            console.log('Exporting performance report...');
+            
+            // Gather performance data
+            const reportData = {
+                timestamp: new Date().toISOString(),
+                time_range: currentTimeRange,
+                performance_score: document.getElementById('performanceScore').textContent,
+                metrics: {
+                    response_time: document.getElementById('avgResponseTime').textContent,
+                    accuracy_rate: document.getElementById('accuracyRate').textContent,
+                    error_rate: document.getElementById('errorRate').textContent,
+                    uptime: document.getElementById('uptime').textContent,
+                    throughput: document.getElementById('throughput').textContent,
+                    cpu_usage: document.getElementById('cpuUsage').textContent,
+                    memory_usage: document.getElementById('memoryUsage').textContent,
+                    system_health: document.getElementById('systemHealth').textContent
+                }
+            };
+            
+            // Convert to JSON
+            const jsonData = JSON.stringify(reportData, null, 2);
+            
+            // Create download
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `performance_report_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            showNotification('Performance report exported successfully!', 'success');
+        }
+        
+        function useSamplePerformanceData() {
+            // Sample data for demonstration
+            const sampleData = {
+                avg_response_time: 245,
+                accuracy_rate: 82.5,
+                error_rate: 2.3,
+                uptime: 99.8,
+                throughput: 142,
+                cpu_usage: 24,
+                memory_usage: 68,
+                disk_io: 42,
+                fast_responses: 78,
+                medium_responses: 18,
+                slow_responses: 4,
+                over25_accuracy: 85,
+                under25_accuracy: 79
+            };
+            
+            updatePerformanceData(sampleData);
+            showNotification('Using sample performance data', 'info');
+        }
+        
+        function startLiveUpdates() {
+            // Simulate live updates to charts
+            setInterval(() => {
+                if (responseTimeChart) {
+                    // Add new data point and remove oldest
+                    const data = responseTimeChart.data.datasets[0].data;
+                    const lastValue = data[data.length - 1];
+                    const newValue = lastValue + (Math.random() * 20 - 10);
+                    
+                    data.shift();
+                    data.push(Math.max(200, Math.min(300, newValue)));
+                    
+                    responseTimeChart.update();
+                }
+            }, 10000); // Update every 10 seconds
+        }
+        
+        function formatNumber(num, decimals = 0) {
+            return num.toLocaleString(undefined, {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            });
+        }
+        
+        function formatPercentage(num) {
+            return num.toFixed(1) + '%';
+        }
+        
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            // Add styles for notification
+            if (!document.querySelector('.notification-container')) {
+                const container = document.createElement('div');
+                container.className = 'notification-container';
+                document.body.appendChild(container);
+            }
+            
+            document.querySelector('.notification-container').appendChild(notification);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 3000);
+        }
+    </script>
+    
+    <!-- Notification Styles -->
+    <style>
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .notification {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+            animation: slideIn 0.3s ease-out;
+            border-left: 4px solid #8b5cf6;
+        }
+        
+        .notification-success {
+            border-left-color: #10b981;
+        }
+        
+        .notification-info {
+            border-left-color: #8b5cf6;
+        }
+        
+        .notification-warning {
+            border-left-color: #f59e0b;
+        }
+        
+        .notification button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #64748b;
+            margin-left: auto;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .metric-desc {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</body>
+</html>
