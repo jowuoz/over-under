@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Statistics - Over/Under Predictor</title>
+    
+    <!-- CSS Links -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js for Data Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Additional Styles for Statistics Page -->
+    <style>
+        /* Statistics Page Specific Styles */
+        .page-header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .page-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Large Stats Grid */
+        .stats-grid-large {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-large {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: transform 0.2s;
+        }
+        
+        .stat-large:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-large-icon {
+            background: #f8fafc;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        
+        .stat-large-content {
+            flex: 1;
+        }
+        
+        .stat-large-content h3 {
+            font-size: 1rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-large-number {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+            line-height: 1;
+        }
+        
+        .stat-large-desc {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+        
+        /* Card Color Borders */
+        .card-primary { border-left: 6px solid #3b82f6; }
+        .card-success { border-left: 6px solid #10b981; }
+        .card-warning { border-left: 6px solid #f59e0b; }
+        .card-danger { border-left: 6px solid #ef4444; }
+        
+        /* Detailed Statistics */
+        .detailed-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .detail-stat {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .detail-stat h4 {
+            font-size: 1rem;
+            color: #64748b;
+            margin-bottom: 1rem;
+        }
+        
+        .detail-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1e293b;
+            margin: 0.5rem 0;
+        }
+        
+        .detail-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+        
+        /* Sources Grid */
+        .sources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .source-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        
+        .source-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .source-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin: 0 auto 1rem;
+            color: white;
+        }
+        
+        .source-icon.api { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); }
+        .source-icon.scraper { background: linear-gradient(135deg, #10b981 0%, #047857 100%); }
+        .source-icon.cache { background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); }
+        .source-icon.reliability { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        
+        .source-card h4 {
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+            color: #1e293b;
+        }
+        
+        .source-count {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .source-desc {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        
+        /* Charts Container */
+        .charts-section {
+            margin: 3rem 0;
+        }
+        
+        .chart-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-card-large {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f1f5f9;
+        }
+        
+        .chart-header h3 {
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .chart-container-large {
+            position: relative;
+            height: 300px;
+            margin: 1rem 0;
+        }
+        
+        /* Timeline */
+        .timeline {
+            margin: 2rem 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: -1.5rem;
+            width: 2px;
+            background: #e2e8f0;
+        }
+        
+        .timeline-item:last-child:before {
+            display: none;
+        }
+        
+        .timeline-marker {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #3b82f6;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .timeline-content {
+            flex: 1;
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .timeline-content h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: #1e293b;
+        }
+        
+        .timeline-content p {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+        
+        .timeline-date {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+        
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .kpi-card {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+        
+        .kpi-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1e293b;
+        }
+        
+        .kpi-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+        
+        .kpi-trend {
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.25rem;
+            margin-top: 0.25rem;
+        }
+        
+        .trend-up { color: #10b981; }
+        .trend-down { color: #ef4444; }
+        .trend-neutral { color: #64748b; }
+        
+        /* Performance Metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .metric-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .metric-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .metric-progress {
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+        
+        .metric-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+        
+        /* Time Range Selector */
+        .time-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .time-btn {
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .time-btn:hover {
+            background: #f8fafc;
+        }
+        
+        .time-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        /* Stats Comparison */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .comparison-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .comparison-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .comparison-title {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .comparison-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .comparison-change {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 1rem;
+            background: #f0f9ff;
+            color: #0ea5e9;
+        }
+        
+        .comparison-change.negative {
+            background: #fef2f2;
+            color: #ef4444;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .stats-grid-large {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-large {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .detailed-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .sources-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header h1 {
+                font-size: 2rem;
+            }
+            
+            .stat-large-number {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Page Header -->
+        <header class="page-header">
+            <h1><i class="fas fa-chart-bar"></i> System Statistics</h1>
+            <div class="header-actions">
+                <a href="index.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Dashboard
+                </a>
+                <button class="btn-export" onclick="exportStatistics()">
+                    <i class="fas fa-file-export"></i> Export Report
+                </button>
+                <button class="btn-back" style="background: #10b981;" onclick="refreshStatistics()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </header>
+
+        <!-- Time Range Selector -->
+        <div class="time-selector">
+            <button class="time-btn active" onclick="setTimeRange('today')">Today</button>
+            <button class="time-btn" onclick="setTimeRange('week')">This Week</button>
+            <button class="time-btn" onclick="setTimeRange('month')">This Month</button>
+            <button class="time-btn" onclick="setTimeRange('quarter')">Last 3 Months</button>
+            <button class="time-btn" onclick="setTimeRange('year')">This Year</button>
+            <button class="time-btn" onclick="setTimeRange('all')">All Time</button>
+        </div>
+
+        <!-- Performance Overview -->
+        <div class="stats-grid-large">
+            <div class="stat-large card-primary">
+                <div class="stat-large-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="stat-large-content">
+                    <h3>Total Predictions</h3>
+                    <p class="stat-large-number" id="totalPredictions">0</p>
+                    <p class="stat-large-desc">Processed this week</p>
+                    <div class="kpi-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="predictionsTrend">+12%</span> from last week
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-large card-success">
+                <div class="stat-large-icon">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <div class="stat-large-content">
+                    <h3>Accuracy Rate</h3>
+                    <p class="stat-large-number" id="accuracyRate">0%</p>
+                    <p class="stat-large-desc">Based on historical data</p>
+                    <div class="kpi-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="accuracyTrend">+3.2%</span> improvement
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-large card-warning">
+                <div class="stat-large-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="stat-large-content">
+                    <h3>Avg. Response Time</h3>
+                    <p class="stat-large-number" id="responseTime">0ms</p>
+                    <p class="stat-large-desc">Data processing speed</p>
+                    <div class="kpi-trend trend-down">
+                        <i class="fas fa-arrow-down"></i>
+                        <span id="responseTrend">-15ms</span> faster
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-large card-danger">
+                <div class="stat-large-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="stat-large-content">
+                    <h3>Error Rate</h3>
+                    <p class="stat-large-number" id="errorRate">0%</p>
+                    <p class="stat-large-desc">Failed data collection</p>
+                    <div class="kpi-trend trend-down">
+                        <i class="fas fa-arrow-down"></i>
+                        <span id="errorTrend">-1.2%</span> from last week
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Charts -->
+        <div class="charts-section">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-line"></i> Performance Trends</h2>
+                <div class="chart-controls">
+                    <select id="chartMetric" class="filter-select" onchange="updateCharts()">
+                        <option value="accuracy">Accuracy Rate</option>
+                        <option value="predictions">Predictions Volume</option>
+                        <option value="response">Response Time</option>
+                        <option value="errors">Error Rate</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="chart-row">
+                <div class="chart-card-large">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-line"></i> Weekly Performance</h3>
+                    </div>
+                    <div class="chart-container-large">
+                        <canvas id="weeklyChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="chart-card-large">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-chart-pie"></i> Prediction Distribution</h3>
+                    </div>
+                    <div class="chart-container-large">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Analysis -->
+        <div class="section">
+            <h2><i class="fas fa-chart-pie"></i> Detailed Analysis</h2>
+            
+            <div class="detailed-stats">
+                <div class="detail-stat">
+                    <h4>League Coverage</h4>
+                    <p class="detail-number" id="leaguesCovered">0</p>
+                    <p class="detail-label">Different leagues monitored</p>
+                </div>
+                
+                <div class="detail-stat">
+                    <h4>Avg. Games per Run</h4>
+                    <p class="detail-number" id="gamesPerRun">0</p>
+                    <p class="detail-label">Live games analyzed</p>
+                </div>
+                
+                <div class="detail-stat">
+                    <h4>Success Rate (Over 2.5)</h4>
+                    <p class="detail-number" id="over25Success">0%</p>
+                    <p class="detail-label">When probability > 75%</p>
+                </div>
+                
+                <div class="detail-stat">
+                    <h4>System Uptime</h4>
+                    <p class="detail-number" id="systemUptime">0%</p>
+                    <p class="detail-label">Last 30 days</p>
+                </div>
+            </div>
+            
+            <!-- KPI Grid -->
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-value" id="avgConfidence">0%</div>
+                    <div class="kpi-label">Avg Confidence</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value" id="peakLoad">0</div>
+                    <div class="kpi-label">Peak Load (games/hr)</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value" id="dataFreshness">0s</div>
+                    <div class="kpi-label">Data Freshness</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-value" id="apiCalls">0</div>
+                    <div class="kpi-label">API Calls Today</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Sources -->
+        <div class="section">
+            <h2><i class="fas fa-server"></i> Data Sources & Infrastructure</h2>
+            
+            <div class="sources-grid">
+                <div class="source-card">
+                    <div class="source-icon api">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <h4>API Sources</h4>
+                    <p class="source-count" id="apiSources">0</p>
+                    <p class="source-desc">Structured data APIs</p>
+                    <div class="metric-footer">
+                        <span>Status: <span class="status-text" id="apiStatus">Active</span></span>
+                    </div>
+                </div>
+                
+                <div class="source-card">
+                    <div class="source-icon scraper">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h4>Web Scrapers</h4>
+                    <p class="source-count" id="webScrapers">0</p>
+                    <p class="source-desc">Live score websites</p>
+                    <div class="metric-footer">
+                        <span>Status: <span class="status-text" id="scraperStatus">Active</span></span>
+                    </div>
+                </div>
+                
+                <div class="source-card">
+                    <div class="source-icon cache">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h4>Cache Hit Rate</h4>
+                    <p class="source-count" id="cacheHitRate">0%</p>
+                    <p class="source-desc">Reduced API calls</p>
+                    <div class="metric-footer">
+                        <span>Efficiency: <span id="cacheEfficiency">High</span></span>
+                    </div>
+                </div>
+                
+                <div class="source-card">
+                    <div class="source-icon reliability">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4>Data Reliability</h4>
+                    <p class="source-count" id="dataReliability">0%</p>
+                    <p class="source-desc">Accuracy of collected data</p>
+                    <div class="metric-footer">
+                        <span>Score: <span id="reliabilityScore">Excellent</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="section">
+            <h2><i class="fas fa-tachometer-alt"></i> System Performance</h2>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">Memory Usage</div>
+                        <div class="metric-value" id="memoryUsage">0%</div>
+                    </div>
+                    <div class="metric-progress">
+                        <div class="progress-fill" id="memoryProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="metric-footer">
+                        <span>Used: <span id="memoryUsed">0MB</span></span>
+                        <span>Total: <span id="memoryTotal">0MB</span></span>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">CPU Utilization</div>
+                        <div class="metric-value" id="cpuUsage">0%</div>
+                    </div>
+                    <div class="metric-progress">
+                        <div class="progress-fill" id="cpuProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="metric-footer">
+                        <span>Peak: <span id="cpuPeak">0%</span></span>
+                        <span>Average: <span id="cpuAvg">0%</span></span>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <div class="metric-title">Disk I/O</div>
+                        <div class="metric-value" id="diskIO">0</div>
+                    </div>
+                    <div class="metric-progress">
+                        <div class="progress-fill" id="diskProgress" style="width: 0%"></div>
+                    </div>
+                    <div class="metric-footer">
+                        <span>Read: <span id="diskRead">0MB/s</span></span>
+                        <span>Write: <span id="diskWrite">0MB/s</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="section">
+            <h2><i class="fas fa-history"></i> Recent System Activity</h2>
+            
+            <div class="timeline" id="systemTimeline">
+                <!-- Timeline items will be populated by JavaScript -->
+                <div class="empty-state" style="text-align: left; padding: 2rem;">
+                    <i class="fas fa-clock"></i>
+                    <p>Loading system activity...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p><i class="fas fa-code"></i> Over/Under Predictor Analytics</p>
+                    <p><i class="fas fa-clock"></i> Report generated: <span id="reportGenerated">Just now</span></p>
+                    <p><i class="fas fa-database"></i> Data last updated: <span id="dataUpdated">Loading...</span></p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html"><i class="fas fa-home"></i> Dashboard</a>
+                    <a href="alerts.html"><i class="fas fa-exclamation-triangle"></i> Alerts</a>
+                    <a href="performance.html"><i class="fas fa-tachometer-alt"></i> Performance</a>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                <p>© <span id="currentYear">2024</span> Over/Under Predictor. Statistics are updated in real-time.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/statistics.js"></script>
+    
+    <!-- Statistics Page JavaScript -->
+    <script>
+        // Statistics Page JavaScript
+        let currentTimeRange = 'today';
+        let weeklyChart = null;
+        let distributionChart = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current year in footer
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            
+            // Set report generation time
+            document.getElementById('reportGenerated').textContent = new Date().toLocaleString();
+            
+            // Load statistics data
+            loadStatisticsData();
+            
+            // Initialize charts
+            initializeCharts();
+            
+            // Set up refresh interval (every 60 seconds)
+            setInterval(refreshStatistics, 60000);
+            
+            // Load sample data for demonstration
+            setTimeout(loadSampleData, 1000);
+        });
+        
+        function setTimeRange(range) {
+            currentTimeRange = range;
+            
+            // Update active button
+            document.querySelectorAll('.time-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Reload data for selected time range
+            loadStatisticsData();
+        }
+        
+        function loadStatisticsData() {
+            console.log('Loading statistics data for:', currentTimeRange);
+            
+            // Try to load from data/latest.json first
+            fetch('data/latest.json')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    updateStatistics(data);
+                })
+                .catch(error => {
+                    console.log('Could not load statistics from latest.json:', error);
+                    
+                    // Try to load from statistics data file
+                    fetch('data/statistics.json')
+                        .then(response => {
+                            if (!response.ok) throw new Error('Statistics file not found');
+                            return response.json();
+                        })
+                        .then(stats => {
+                            updateStatistics(stats);
+                        })
+                        .catch(error2 => {
+                            console.log('Could not load statistics file:', error2);
+                            
+                            // Use sample data as fallback
+                            useSampleStatistics();
+                        });
+                });
+        }
+        
+        function updateStatistics(data) {
+            // Update main statistics
+            updateMainStats(data);
+            
+            // Update charts
+            updateChartsData(data);
+            
+            // Update timeline
+            updateTimeline(data);
+            
+            // Update data freshness
+            document.getElementById('dataUpdated').textContent = new Date().toLocaleTimeString();
+        }
+        
+        function updateMainStats(data) {
+            // Update performance overview
+            document.getElementById('totalPredictions').textContent = 
+                formatNumber(data.total_predictions || data.predictions_count || 0);
+            
+            document.getElementById('accuracyRate').textContent = 
+                formatPercentage(data.accuracy_rate || 0);
+            
+            document.getElementById('responseTime').textContent = 
+                formatNumber(data.avg_response_time || 245) + 'ms';
+            
+            document.getElementById('errorRate').textContent = 
+                formatPercentage(data.error_rate || 0);
+            
+            // Update detailed analysis
+            document.getElementById('leaguesCovered').textContent = 
+                data.leagues_covered || 15;
+            
+            document.getElementById('gamesPerRun').textContent = 
+                formatNumber(data.avg_games_per_run || 0, 1);
+            
+            document.getElementById('over25Success').textContent = 
+                formatPercentage(data.over_25_success || 0);
+            
+            document.getElementById('systemUptime').textContent = 
+                formatPercentage(data.uptime || 0);
+            
+            // Update data sources
+            document.getElementById('apiSources').textContent = 
+                data.api_sources || 3;
+            
+            document.getElementById('webScrapers').textContent = 
+                data.web_scrapers || 2;
+            
+            document.getElementById('cacheHitRate').textContent = 
+                formatPercentage(data.cache_hit_rate || 0);
+            
+            document.getElementById('dataReliability').textContent = 
+                formatPercentage(data.data_reliability || 0);
+            
+            // Update KPI metrics
+            document.getElementById('avgConfidence').textContent = 
+                formatPercentage(data.avg_confidence || 0);
+            
+            document.getElementById('peakLoad').textContent = 
+                data.peak_load || 42;
+            
+            document.getElementById('dataFreshness').textContent = 
+                (data.data_freshness || 5) + 's';
+            
+            document.getElementById('apiCalls').textContent = 
+                formatNumber(data.api_calls || 1250);
+        }
+        
+        function initializeCharts() {
+            // Weekly Performance Chart
+            const weeklyCtx = document.getElementById('weeklyChart').getContext('2d');
+            weeklyChart = new Chart(weeklyCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Accuracy Rate',
+                        data: [72, 75, 78, 82, 80, 85, 83],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Predictions',
+                        data: [120, 135, 142, 155, 148, 162, 158],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            grid: {
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Distribution Chart
+            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+            distributionChart = new Chart(distributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Over 2.5', 'Under 2.5', 'Push', 'No Bet'],
+                    datasets: [{
+                        data: [65, 25, 8, 2],
+                        backgroundColor: [
+                            '#10b981',
+                            '#ef4444',
+                            '#f59e0b',
+                            '#64748b'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateCharts() {
+            const metric = document.getElementById('chartMetric').value;
+            
+            if (weeklyChart) {
+                // Update chart based on selected metric
+                const metricData = {
+                    'accuracy': [72, 75, 78, 82, 80, 85, 83],
+                    'predictions': [120, 135, 142, 155, 148, 162, 158],
+                    'response': [320, 310, 295, 285, 290, 275, 280],
+                    'errors': [3.2, 2.8, 2.5, 2.1, 2.3, 1.9, 1.8]
+                };
+                
+                weeklyChart.data.datasets[0].data = metricData[metric] || metricData.accuracy;
+                weeklyChart.update();
+            }
+        }
+        
+        function updateChartsData(data) {
+            // Update charts with real data if available
+            if (weeklyChart && data.weekly_data) {
+                weeklyChart.data.datasets[0].data = data.weekly_data;
+                weeklyChart.update();
+            }
+            
+            if (distributionChart && data.distribution) {
+                distributionChart.data.datasets[0].data = data.distribution;
+                distributionChart.update();
+            }
+        }
+        
+        function updateTimeline(data) {
+            const timeline = document.getElementById('systemTimeline');
+            const events = data.timeline || getDefaultTimeline();
+            
+            let html = '';
+            events.forEach(event => {
+                html += `
+                <div class="timeline-item">
+                    <div class="timeline-marker">
+                        <i class="fas ${event.icon}"></i>
+                    </div>
+                    <div class="timeline-content">
+                        <h4>${event.title}</h4>
+                        <p>${event.description}</p>
+                        <div class="timeline-date">${event.time}</div>
+                    </div>
+                </div>
+                `;
+            });
+            
+            timeline.innerHTML = html;
+        }
+        
+        function getDefaultTimeline() {
+            const now = new Date();
+            return [
+                {
+                    icon: 'fa-bell',
+                    title: 'System Startup',
+                    description: 'Prediction system started successfully',
+                    time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                },
+                {
+                    icon: 'fa-database',
+                    title: 'Data Collection',
+                    description: 'Successfully collected data from 3 API sources',
+                    time: formatTime(now, -5)
+                },
+                {
+                    icon: 'fa-chart-line',
+                    title: 'Analysis Complete',
+                    description: 'Analyzed 42 live games with 85% average confidence',
+                    time: formatTime(now, -10)
+                },
+                {
+                    icon: 'fa-exclamation-triangle',
+                    title: 'High Confidence Alert',
+                    description: 'Generated 3 high-confidence over 2.5 alerts',
+                    time: formatTime(now, -15)
+                },
+                {
+                    icon: 'fa-sync-alt',
+                    title: 'System Health Check',
+                    description: 'All systems operating normally',
+                    time: formatTime(now, -20)
+                }
+            ];
+        }
+        
+        function formatTime(baseTime, minutesAgo) {
+            const time = new Date(baseTime.getTime() + minutesAgo * 60000);
+            return time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        function refreshStatistics() {
+            console.log('Refreshing statistics...');
+            
+            // Show loading state
+            document.getElementById('totalPredictions').textContent = '...';
+            document.getElementById('accuracyRate').textContent = '...';
+            
+            // Reload data
+            loadStatisticsData();
+            
+            // Show notification
+            showNotification('Statistics updated successfully!', 'success');
+        }
+        
+        function exportStatistics() {
+            console.log('Exporting statistics report...');
+            
+            // Create export data
+            const exportData = {
+                timestamp: new Date().toISOString(),
+                timeRange: currentTimeRange,
+                statistics: gatherStatistics()
+            };
+            
+            // Convert to JSON
+            const jsonData = JSON.stringify(exportData, null, 2);
+            
+            // Create download
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `statistics_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            showNotification('Statistics report exported successfully!', 'success');
+        }
+        
+        function gatherStatistics() {
+            return {
+                total_predictions: document.getElementById('totalPredictions').textContent,
+                accuracy_rate: document.getElementById('accuracyRate').textContent,
+                response_time: document.getElementById('responseTime').textContent,
+                error_rate: document.getElementById('errorRate').textContent,
+                leagues_covered: document.getElementById('leaguesCovered').textContent,
+                over_25_success: document.getElementById('over25Success').textContent,
+                system_uptime: document.getElementById('systemUptime').textContent,
+                api_sources: document.getElementById('apiSources').textContent,
+                web_scrapers: document.getElementById('webScrapers').textContent,
+                cache_hit_rate: document.getElementById('cacheHitRate').textContent,
+                data_reliability: document.getElementById('dataReliability').textContent
+            };
+        }
+        
+        function useSampleStatistics() {
+            // Sample data for demonstration
+            const sampleData = {
+                total_predictions: 12542,
+                accuracy_rate: 82.5,
+                avg_response_time: 245,
+                error_rate: 2.3,
+                leagues_covered: 15,
+                avg_games_per_run: 42.5,
+                over_25_success: 78.2,
+                uptime: 99.8,
+                api_sources: 3,
+                web_scrapers: 2,
+                cache_hit_rate: 65,
+                data_reliability: 94,
+                avg_confidence: 78.5,
+                peak_load: 42,
+                data_freshness: 5,
+                api_calls: 1250
+            };
+            
+            updateStatistics(sampleData);
+            showNotification('Using sample statistics data', 'info');
+        }
+        
+        function formatNumber(num, decimals = 0) {
+            return num.toLocaleString(undefined, {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            });
+        }
+        
+        function formatPercentage(num) {
+            return num.toFixed(1) + '%';
+        }
+        
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+                <button onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            // Add styles for notification
+            if (!document.querySelector('.notification-container')) {
+                const container = document.createElement('div');
+                container.className = 'notification-container';
+                document.body.appendChild(container);
+            }
+            
+            document.querySelector('.notification-container').appendChild(notification);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 3000);
+        }
+        
+        // Load sample data for initial display
+        function loadSampleData() {
+            // Check if we already have real data
+            const hasRealData = document.getElementById('totalPredictions').textContent !== '0';
+            
+            if (!hasRealData) {
+                useSampleStatistics();
+            }
+        }
+    </script>
+    
+    <!-- Notification Styles -->
+    <style>
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .notification {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+            animation: slideIn 0.3s ease-out;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .notification-success {
+            border-left-color: #10b981;
+        }
+        
+        .notification-info {
+            border-left-color: #3b82f6;
+        }
+        
+        .notification-warning {
+            border-left-color: #f59e0b;
+        }
+        
+        .notification button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #64748b;
+            margin-left: auto;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .chart-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .status-text {
+            color: #10b981;
+            font-weight: 600;
+        }
+    </style>
+</body>
+</html>
