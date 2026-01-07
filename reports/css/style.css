@@ -22,7 +22,7 @@ body::after {{
     z-index: 9999;
     opacity: 0.9;
     font-weight: bold;
-    display: none; /* Remove this line to see verification */
+    display: block !important
 }}
 
 /* ===== CSS VARIABLES ===== */
