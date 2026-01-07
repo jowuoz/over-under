@@ -28,9 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize any interactive elements
     initializeInteractiveElements();
-    
-    // Set current year in footer
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
 });
 
 // Start countdown timer
