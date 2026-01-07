@@ -162,6 +162,10 @@ a:hover {{
     max-width: 1400px;
     margin: 0 auto;
     padding: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl); /* Creates consistent spacing between sections */
+    min-height: 100vh;
 }}
 
 /* ===== HEADER SECTION ===== */
