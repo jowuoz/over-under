@@ -10,11 +10,20 @@ from dataclasses import dataclass
 
 @dataclass
 class ScraperConfig:
-    """Scraper configuration"""
+    """Scraper configuration - UPDATED VERSION"""
     active: list
-    request_delay: int
+    request_delay: float  # Changed from int to float
     timeout: int
     user_agent: str
+    max_retries: int = 3  # NEW: Add this
+    cache_duration: int = 300  # NEW: Add this
+    
+    def __post_init__(self):
+        """Validate configuration"""
+        if self.request_delay < 0.5:
+            self.request_delay = 1.0  # Minimum delay
+        if self.timeout < 5:
+            self.timeout = 10  # Minimum timeout
 
 @dataclass
 class PredictorConfig:
