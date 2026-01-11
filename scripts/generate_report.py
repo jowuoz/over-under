@@ -32,6 +32,13 @@ try:
 except ImportError:
     print("Warning: Could not import config or base_scraper")
 
+try:
+    from scraper_manager import create_scraper_manager
+    HAS_SCRAPER_MANAGER = True
+except ImportError:
+    HAS_SCRAPER_MANAGER = False
+    print("Warning: Could not import scraper_manager")
+
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
@@ -102,7 +109,77 @@ class ReportGenerator:
         }
         
         logger.info(f"Report generator initialized. Reports will be saved to: {self.reports_dir}")
-    
+        
+    def _load_predictions_from_scrapers(self):
+        """Load predictions using scraper manager"""
+        try:
+            if not HAS_SCRAPER_MANAGER:
+                logger.warning("Scraper manager not available, using test data")
+                return self._create_test_predictions()
+            
+            # Initialize or get scraper manager
+            if not hasattr(self, 'scraper_manager'):
+                self.scraper_manager = create_scraper_manager()
+                logger.info("✅ Scraper manager initialized")
+            
+            # Get games formatted for dashboard
+            games = self.scraper_manager.get_games_for_dashboard(use_cache=True)
+            logger.info(f"✅ Loaded {len(games)} games from scrapers")
+            
+            return games
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to load predictions from scrapers: {e}")
+            return self._create_test_predictions()
+            
+    def _create_test_predictions(self):
+        """Create test predictions when scrapers fail"""
+        from datetime import datetime
+        
+        test_games = [
+            {
+                'home_team': 'Manchester City',
+                'away_team': 'Liverpool',
+                'home_score': 2,
+                'away_score': 1,
+                'minute': '75',
+                'status': 'LIVE',
+                'league': 'Premier League',
+                'probability_over_25': 85.5,
+                'confidence': 88.0,
+                'last_updated': datetime.now().strftime('%H:%M:%S'),
+                'source': 'test_data'
+            },
+            {
+                'home_team': 'Real Madrid',
+                'away_team': 'Barcelona',
+                'home_score': 1,
+                'away_score': 1,
+                'minute': '60',
+                'status': 'LIVE',
+                'league': 'La Liga',
+                'probability_over_25': 72.0,
+                'confidence': 75.5,
+                'last_updated': datetime.now().strftime('%H:%M:%S'),
+                'source': 'test_data'
+            },
+            {
+                'home_team': 'Bayern Munich',
+                'away_team': 'Borussia Dortmund',
+                'home_score': 0,
+                'away_score': 0,
+                'minute': '30',
+                'status': 'LIVE',
+                'league': 'Bundesliga',
+                'probability_over_25': 65.5,
+                'confidence': 70.0,
+                'last_updated': datetime.now().strftime('%H:%M:%S'),
+                'source': 'test_data'
+            }
+        ]
+        
+        logger.info(f"Created {len(test_games)} test predictions")
+        return test_games        
     def _get_default_config(self):
         """Get default configuration if config module not available"""
         return {
@@ -236,53 +313,113 @@ class ReportGenerator:
         Generate main HTML dashboard
         """
         logger.info("Generating main dashboard")
+
+        # CRITICAL: Load predictions from scrapers FIRST
+        logger.info("Loading predictions from scrapers...")
+        self.predictions = self._load_predictions_from_scrapers()
+        
+        # Load alerts if available
+        if not hasattr(self, 'alerts') or not self.alerts:
+            try:
+                self.load_data()  # Try to load from file
+            except:
+                self.alerts = []  # Empty if can't load
         
         # Calculate statistics
         stats = self._calculate_dashboard_stats()
         
         # Get recent alerts
-        recent_alerts = self.alerts[-10:]  # Last 10 alerts
+        recent_alerts = self.alerts[-10:] if hasattr(self, 'alerts') and self.alerts else []
         
-        # Get live games
-        live_games = [p for p in self.predictions if p.get('status') in ['live', 'LIVE', 'IN_PLAY']]
+        # Get live games - FIXED FILTER
+        live_games = []
+        if self.predictions:
+            live_games = [
+                p for p in self.predictions 
+                if isinstance(p, dict) and 
+                str(p.get('status', '')).upper() in ['LIVE', 'IN_PLAY', '1H', '2H', 'HT', 'IN_PROGRESS', 'LIVE_HALF_TIME']
+            ]
+        
+        logger.info(f"📊 Stats calculated")
+        logger.info(f"🚨 Recent alerts: {len(recent_alerts)}")
+        logger.info(f"⚽ Total predictions: {len(self.predictions)}")
+        logger.info(f"🔥 Live games: {len(live_games)}")
+        
+        # Show sample games for debugging
+        if self.predictions:
+            logger.info("🎮 Sample games loaded:")
+            for i, game in enumerate(self.predictions[:3]):
+                logger.info(f"  {i+1}. {game.get('home_team')} {game.get('home_score')}-{game.get('away_score')} {game.get('away_team')}")
+                logger.info(f"     League: {game.get('league')}, Status: {game.get('status')}")
         
         # Generate charts
         self._generate_confidence_chart()
         self._generate_league_distribution_chart()
+
+        # Add favicon
+        favicon_url = "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>"
         
-        # Create HTML
+        # Create HTML - UPDATED
         html_content = f"""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚽ {self.config['system']['name']} - Live Dashboard</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <meta http-equiv="refresh" content="300">
-</head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <header class="dashboard-header">
-            <div class="header-content">
-                <h1><i class="fas fa-futbol"></i> {self.config['system']['name']}</h1>
-                <p class="subtitle">AI-powered over/under prediction system</p>
-                <div class="header-stats">
-                    <div class="stat-badge">
-                        <i class="fas fa-clock"></i>
-                        <span>Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</span>
-                    </div>
-                    <div class="stat-badge">
-                        <i class="fas fa-sync-alt"></i>
-                        <span>Updates every {self.config['system']['update_interval'] // 60} minutes</span>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>⚽ {self.config['system']['name']} - Live Dashboard</title>
+        <link rel="icon" href="{favicon_url}">
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <meta http-equiv="refresh" content="300">
+        <style>
+            /* Debug info - remove after testing */
+            .debug-info {{
+                background: #f0f9ff;
+                padding: 10px;
+                border-radius: 5px;
+                margin-bottom: 15px;
+                font-size: 14px;
+                color: #0369a1;
+                border-left: 4px solid #0ea5e9;
+            }}
+            .debug-info strong {{
+                color: #0c4a6e;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <!-- Debug Info -->
+            <div class="debug-info">
+                <strong>System Status:</strong> 
+                Loaded {len(self.predictions)} predictions | 
+                {len(live_games)} live games | 
+                Last updated: {datetime.now().strftime('%H:%M:%S')}
+            </div>
+            
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-content">
+                    <h1><i class="fas fa-futbol"></i> {self.config['system']['name']}</h1>
+                    <p class="subtitle">AI-powered over/under prediction system</p>
+                    <div class="header-stats">
+                        <div class="stat-badge">
+                            <i class="fas fa-clock"></i>
+                            <span>Last updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</span>
+                        </div>
+                        <div class="stat-badge">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Updates every {self.config['system']['update_interval'] // 60} minutes</span>
+                        </div>
+                        <div class="stat-badge">
+                            <i class="fas fa-database"></i>
+                            <span>Source: {"Live API" if self.predictions and self.predictions[0].get('source') != 'test_data' else "Test Data"}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </header>
-
+            </header>
+        
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card card-primary">
