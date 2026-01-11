@@ -4,9 +4,12 @@ system:
   timezone: "UTC"
 
 scrapers:
-  active: ["flashscore"]  # Start with just one
-  request_delay: 2  # Seconds between requests
-  timeout: 10  # Request timeout in seconds
+  active: ['flashscore', 'football_data_api', 'api_football']
+  request_delay: 1.0  # Use float
+  timeout: 10
+  user_agent: 'Mozilla/5.0 (OverUnderPredictor/1.0)'
+  max_retries: 3  # NEW
+  cache_duration: 300  # NEW (5 minutes)
 
 predictor:
   thresholds:
