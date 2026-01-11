@@ -20,7 +20,7 @@ try:
         deduplicate_games, filter_live_games, merge_games_from_sources,
         FootballDataScraper, ApiFootballScraper
     )
-    from .flashscore_scraper import FlashScoreScraper, create_flashscore_scraper
+    from .flashscore_scraper import FlashScoreScraper
 except ImportError:
     from src.scrapers.base_scraper import (
         BaseScraper, ScrapedGame, DataSourceType,
