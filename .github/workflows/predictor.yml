@@ -51,7 +51,9 @@ jobs:
     
     - name: Create necessary directories
       run: |
-        mkdir -p storage/logs storage/data/historical reports/data
+        mkdir -p storage/logs
+        mkdir -p storage/data/historical
+        mkdir -p reports/data
         echo "Created directory structure"
     
     - name: Run tests (optional)
