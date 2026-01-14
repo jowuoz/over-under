@@ -2074,18 +2074,43 @@ function showPage(pageNum) {
         logger.info(f"Sitemap saved to: {sitemap_path}")
     
     def _save_chart_data(self):
-        """Save data for charts"""
-        chart_data = {
-            'last_updated': datetime.now().isoformat(),
-            'total_predictions': len(self.predictions),
-            'total_alerts': len(self.alerts),
-            'live_games': len([p for p in self.predictions if p.get('status') in ['live', 'LIVE', 'IN_PLAY']]),
-            'avg_confidence': self._calculate_avg_confidence(self.predictions),
-        }
-        
-        chart_path = self.reports_dir / "data" / "latest.json"
-        with open(chart_path, 'w') as f:
-            json.dump(chart_data, f)
+        """Save full data for dashboard including predictions and alerts"""
+        try:
+            # Calculate dashboard stats
+            stats = self._calculate_dashboard_stats()
+            
+            # Prepare the full data structure that dashboard.js expects
+            dashboard_data = {
+                'last_updated': datetime.now().isoformat(),
+                'predictions': self.predictions,  # This is critical!
+                'alerts': self.alerts,  # This is critical!
+                'summary': {
+                    'total_games': len(self.predictions),
+                    'live_games': stats['live_games'],
+                    'active_alerts': stats['active_alerts'],
+                    'avg_confidence': stats['avg_confidence'],
+                    'high_confidence_pct': stats['high_confidence_pct'],
+                    'top_league': stats['top_league'],
+                    'top_league_games': stats['top_league_games']
+                }
+            }
+            
+            # Save to reports/data/latest.json
+            chart_path = self.reports_dir / "data" / "latest.json"
+            with open(chart_path, 'w') as f:
+                json.dump(dashboard_data, f, indent=2)
+            
+            logger.info(f"✅ Saved dashboard data to {chart_path} with {len(self.predictions)} predictions")
+            
+            # Also save alerts separately if needed
+            alerts_path = self.reports_dir / "data" / "alerts.json"
+            with open(alerts_path, 'w') as f:
+                json.dump({'alerts': self.alerts, 'total': len(self.alerts)}, f, indent=2)
+            
+            logger.info(f"✅ Saved alerts data to {alerts_path} with {len(self.alerts)} alerts")
+            
+        except Exception as e:
+            logger.error(f"❌ Error saving chart data: {e}")
     
     def cleanup_old_reports(self, days_to_keep: int = 30):
         """
