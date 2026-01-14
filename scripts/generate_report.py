@@ -73,6 +73,11 @@ class ReportGenerator:
         (self.reports_dir / "charts").mkdir(exist_ok=True)
         (self.reports_dir / "css").mkdir(exist_ok=True)
         (self.reports_dir / "js").mkdir(exist_ok=True)
+
+        # Also ensure data files exist immediately
+        self._ensure_data_files_exist()
+        
+        logger.info(f"✅ All directories created in: {self.reports_dir}")
         
         # Data structures
         self.predictions = []
@@ -110,6 +115,24 @@ class ReportGenerator:
         
         logger.info(f"Report generator initialized. Reports will be saved to: {self.reports_dir}")
         
+    def _ensure_data_files_exist(self):
+        """Ensure all required JSON files exist (even if empty)"""
+        data_dir = self.reports_dir / "data"
+        
+        required_files = {
+            'latest.json': {'predictions': [], 'alerts': [], 'summary': {}},
+            'confidence_chart.json': {'labels': [], 'data': [], 'colors': []},
+            'league_chart.json': {'labels': [], 'data': [], 'colors': []},
+            'alerts.json': {'alerts': [], 'total': 0}
+        }
+        
+        for filename, default_data in required_files.items():
+            file_path = data_dir / filename
+            if not file_path.exists():
+                with open(file_path, 'w') as f:
+                    json.dump(default_data, f, indent=2)
+                logger.info(f"✅ Created empty {filename}")
+    
     def _load_predictions_from_scrapers(self):
         """Load predictions using scraper manager"""
         try:
