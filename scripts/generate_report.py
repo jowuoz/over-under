@@ -317,7 +317,12 @@ class ReportGenerator:
         # CRITICAL: Load predictions from scrapers FIRST
         logger.info("Loading predictions from scrapers...")
         self.predictions = self._load_predictions_from_scrapers()
-        
+
+        # Make sure we have predictions
+        if not self.predictions:
+            logger.warning("⚠️ No predictions loaded! Creating test data...")
+            self.predictions = self._create_test_predictions()
+            
         # Load alerts if available
         if not hasattr(self, 'alerts') or not self.alerts:
             try:
@@ -355,6 +360,7 @@ class ReportGenerator:
         # Generate charts
         self._generate_confidence_chart()
         self._generate_league_distribution_chart()
+        self._save_chart_data()
 
         # Add favicon
         favicon_url = "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>"
