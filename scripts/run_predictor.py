@@ -5,7 +5,11 @@ Main script that runs in GitHub Actions
 import sys
 import os
 import asyncio
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(current_dir)  # Go up one level from scripts/
+sys.path.insert(0, project_root)
+
 
 from src.scrapers.scraper_manager import ScraperManager
 from src.predictor.calculator import ProbabilityCalculator
