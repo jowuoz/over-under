@@ -659,7 +659,10 @@ class PredictionFormatter:
                 field = ""
             field_str = str(field)
             if ',' in field_str or '"' in field_str:
-                field_str = f'"{field_str.replace(\"\", "\"\"")}"'
+                # Escape double quotes by replacing " with ""
+                escaped_str = field_str.replace('"', '""')
+                # Wrap in quotes
+                field_str = f'"{escaped_str}"'
             escaped_fields.append(field_str)
         
         return ",".join(escaped_fields)
