@@ -52,9 +52,13 @@ jobs:
     - name: Create necessary directories
       run: |
         mkdir -p storage/logs
-        mkdir -p storage/data/historical
+        mkdir -p storage/data
+        mkdir -p storage/data/historical || true  # Force success even if it exists
         mkdir -p reports/data
-        echo "Created directory structure"
+        mkdir -p reports/css
+        mkdir -p reports/js
+        mkdir -p reports/charts
+        echo "Created/verified directory structure"
     
     - name: Run tests (optional)
       if: github.event.inputs.run_tests != 'false'
