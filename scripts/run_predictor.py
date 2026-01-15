@@ -9,7 +9,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 from src.scrapers.scraper_manager import ScraperManager
 from src.predictor.calculator import ProbabilityCalculator
-from src.notifier.telegram_client import TelegramNotifier
+from src.notifier import TelegramNotifier
 from src.utils.logger import SystemLogger
 from src.storage.data_manager import DataManager
 import json
