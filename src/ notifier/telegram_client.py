@@ -13,14 +13,10 @@ import time
 import os
 from urllib.parse import urlencode
 
-# Import formatters and models
-try:
-    from ..predictor.formatter import PredictionFormatter, OutputFormat, AlertLevel
-    from ..predictor.models import Prediction, BatchPrediction
-except ImportError:
-    from src.predictor.formatter import PredictionFormatter, OutputFormat, AlertLevel
-    from src.predictor.models import Prediction, BatchPrediction
-
+# Import models and formatters - USE ABSOLUTE IMPORTS
+from src.predictor.models import Prediction, BatchPrediction, Game, ProbabilityMetrics, RiskAssessment
+from src.predictor.formatter import PredictionFormatter, OutputFormat, AlertLevel
+from src.notifier.telegram_client import TelegramMessage
 
 @dataclass
 class TelegramMessage:
