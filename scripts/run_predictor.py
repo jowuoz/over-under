@@ -10,12 +10,69 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)  # Go up one level from scripts/
 sys.path.insert(0, project_root)
 
+print(f"🚀 Starting prediction run...")
+print(f"📁 Project root: {project_root}")
 
-from src.scrapers.scraper_manager import ScraperManager
-from src.predictor.calculator import ProbabilityCalculator
-from src.notifier import TelegramNotifier
-from src.utils.logger import SystemLogger
-from src.storage.data_manager import DataManager
+try:
+    # Import directly from submodules
+    from src.scrapers.scraper_manager import ScraperManager
+    print("✅ Imported ScraperManager")
+except ImportError as e:
+    print(f"❌ Failed to import ScraperManager: {e}")
+    sys.exit(1)
+
+try:
+    from src.predictor.calculator import ProbabilityCalculator
+    print("✅ Imported ProbabilityCalculator")
+except ImportError as e:
+    print(f"❌ Failed to import ProbabilityCalculator: {e}")
+    sys.exit(1)
+
+try:
+    # Import TelegramNotifier directly from notifier module
+    from src.notifier.telegram_client import TelegramNotifier
+    print("✅ Imported TelegramNotifier")
+except ImportError as e:
+    print(f"❌ Failed to import TelegramNotifier: {e}")
+    # Create a simple fallback
+    class TelegramNotifier:
+        async def send_alert(self, prediction):
+            print(f"📨 Telegram alert (simulated): {prediction.get('home_team', 'Team1')} vs {prediction.get('away_team', 'Team2')}")
+            return True
+    print("⚠️ Using fallback TelegramNotifier")
+
+# Check for other imports
+try:
+    from src.utils.logger import SystemLogger
+    print("✅ Imported SystemLogger")
+except ImportError as e:
+    print(f"⚠️ Failed to import SystemLogger: {e}")
+    # Simple fallback logger
+    class SystemLogger:
+        def info(self, msg): print(f"INFO: {msg}")
+        def error(self, msg): print(f"ERROR: {msg}")
+    print("⚠️ Using fallback SystemLogger")
+
+try:
+    from src.storage.data_manager import DataManager
+    print("✅ Imported DataManager")
+except ImportError as e:
+    print(f"⚠️ Failed to import DataManager: {e}")
+    # Simple fallback data manager
+    class DataManager:
+        def save_predictions(self, predictions, high_prob_games):
+            import json
+            os.makedirs('storage/data', exist_ok=True)
+            data = {
+                'timestamp': datetime.now().isoformat(),
+                'predictions': predictions,
+                'high_probability_games': high_prob_games
+            }
+            with open('storage/data/predictions.json', 'w') as f:
+                json.dump(data, f, indent=2)
+            return 'storage/data/predictions.json'
+    print("⚠️ Using fallback DataManager")
+
 import json
 from datetime import datetime
 import shutil
