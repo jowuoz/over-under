@@ -6,7 +6,7 @@ aiohttp==3.9.1
 # Data processing
 pandas==2.1.4
 numpy==1.24.3
-scipy==1.11.4
+
 
 # Telegram notifications
 python-telegram-bot==20.6
