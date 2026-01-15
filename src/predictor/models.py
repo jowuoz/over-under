@@ -623,11 +623,12 @@ class Prediction:
     # Identification
     id: str
     game: Game
-    timestamp: datetime = field(default_factory=datetime.now)
-    
+        
     # Core prediction
     probability_metrics: ProbabilityMetrics
     risk_assessment: RiskAssessment
+    
+    timestamp: datetime = field(default_factory=datetime.now)
     
     # Additional analysis
     key_factors: List[str] = field(default_factory=list)
