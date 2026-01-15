@@ -8,7 +8,7 @@ __author__ = "Predictor System"
 # Import main components for easy access
 from .scrapers import ScraperManager, FlashScoreScraper
 from .predictor import ProbabilityCalculator, Game, Prediction
-from .notifier import TelegramNotifier, AlertBuilder
+from .notifier import TelegramNotifier
 
 # Package-level exports
 __all__ = [
