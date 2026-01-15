@@ -99,7 +99,7 @@ function loadDashboardData() {
 function loadMainData() {
     console.log('Loading main data from latest.json...');
     
-    fetch('data/latest.json')
+    fetch('./data/latest.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -335,7 +335,7 @@ function initializeCharts() {
 function loadConfidenceChart() {
     console.log('Loading confidence chart...');
     
-    fetch('data/confidence_chart.json')
+    fetch('./data/confidence_chart.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Confidence chart data not found');
@@ -411,7 +411,7 @@ function renderConfidenceChart(chartData) {
 function loadLeagueChart() {
     console.log('Loading league chart...');
     
-    fetch('data/league_chart.json')
+    fetch('./data/league_chart.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error('League chart data not found');
@@ -525,7 +525,7 @@ function updateLiveGamesBadge() {
 function loadRecentAlerts() {
     console.log('Loading recent alerts...');
     
-    fetch('data/latest.json')
+    fetch('./data/latest.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Could not load alerts');
