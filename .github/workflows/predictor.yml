@@ -1,7 +1,12 @@
 name: Over/Under Predictor
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true  # This cancels old runs when new one starts
+  
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Every 5 minutes
+    - cron: '*/15 * * * *'  # Every 5 minutes
   workflow_dispatch:  # Allow manual runs
     inputs:
       force_full_run:
