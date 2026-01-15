@@ -11,10 +11,23 @@ from enum import Enum
 from collections import defaultdict
 import asyncio
 
-# Import models and formatters - USE ABSOLUTE IMPORTS
-from src.predictor.models import Prediction, BatchPrediction, Game, ProbabilityMetrics, RiskAssessment
-from src.predictor.formatter import PredictionFormatter, OutputFormat, AlertLevel
-from src.notifier.telegram_client import TelegramMessage
+# Import models and formatters
+try:
+    # First try absolute imports (when running from scripts/)
+    from src.predictor.models import Prediction, BatchPrediction, Game, ProbabilityMetrics, RiskAssessment
+    from src.predictor.formatter import PredictionFormatter, OutputFormat, AlertLevel
+    from src.notifier.telegram_client import TelegramMessage
+except ImportError:
+    try:
+        # Then try relative imports (when module is imported as part of package)
+        from ..predictor.models import Prediction, BatchPrediction, Game, ProbabilityMetrics, RiskAssessment
+        from ..predictor.formatter import PredictionFormatter, OutputFormat, AlertLevel
+        from .telegram_client import TelegramMessage
+    except ImportError:
+        # Last resort: try direct imports (for testing)
+        from predictor.models import Prediction, BatchPrediction, Game, ProbabilityMetrics, RiskAssessment
+        from predictor.formatter import PredictionFormatter, OutputFormat, AlertLevel
+        from telegram_client import TelegramMessage
 
 
 class AlertType(Enum):
