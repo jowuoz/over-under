@@ -25,3 +25,4 @@ notifications:
   telegram:
     enabled: true
     # Token and chat ID will come from GitHub Secrets
+  min_confidence: 0.60
