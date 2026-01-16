@@ -759,7 +759,7 @@ class ReportGenerator:
         return stats
     
         
-   def _generate_confidence_chart(self):
+    def _generate_confidence_chart(self):
         """Generate confidence distribution chart"""
         chart_data = None  # Initialize chart_data
         
