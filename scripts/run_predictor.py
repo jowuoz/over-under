@@ -88,8 +88,12 @@ async def main():
     try:
         # 1. Scrape live games
         scraper = ScraperManager()
-        games = await scraper.get_live_games()
-        logger.info(f"📊 Found {len(games)} live games")
+        result = await scraper.fetch_all_games()
+        
+        games = result.get('games', [])   # extract the actual list of games
+        metadata = result.get('metadata', {})
+        
+        logger.info(f"📊 Found {len(games)} live games from {metadata.get('total_scrapers', '?')} scrapers")
         print(f"📊 Found {len(games)} live games")
         
         # 2. Calculate probabilities
