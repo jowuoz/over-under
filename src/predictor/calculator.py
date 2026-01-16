@@ -80,7 +80,13 @@ class ProbabilityCalculator:
         self.logger = logging.getLogger("predictor.calculator")
         
         # Model weights
-        self.weights = ModelWeights(**self.config.get('model_weights', {}))
+        self.weights = ModelWeights(
+            time_based=0.35,
+            statistical=0.25,
+            momentum=0.20,
+            league_based=0.10,
+            odds_based=0.10,
+        )
         self.weights.normalize()
         
         # Model instances
