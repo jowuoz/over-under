@@ -759,8 +759,10 @@ class ReportGenerator:
         return stats
     
         
-    def _generate_confidence_chart(self):
+   def _generate_confidence_chart(self):
         """Generate confidence distribution chart"""
+        chart_data = None  # Initialize chart_data
+        
         if not self.predictions:
             logger.warning("⚠️ No predictions for confidence chart")
             # Create sample data for debugging
@@ -777,31 +779,43 @@ class ReportGenerator:
         else:
             # Extract confidence values
             confidences = [p.get('confidence', 0) * 100 for p in self.predictions if p.get('confidence') is not None]
+            
+            if not confidences:
+                logger.warning("⚠️ No confidence values found in predictions")
+                # Create empty chart data
+                chart_data = {
+                    'labels': ['Low (<50%)', 'Medium (50-70%)', 'High (70-85%)', 'Very High (>85%)'],
+                    'data': [0, 0, 0, 0],
+                    'colors': [...]
+                }
+            else:
+                # Create histogram data
+                bins = [0, 50, 70, 85, 100]
+                labels = ['Low (<50%)', 'Medium (50-70%)', 'High (70-85%)', 'Very High (>85%)']
+                
+                hist, _ = np.histogram(confidences, bins=bins)
+                
+                # Save chart data
+                chart_data = {
+                    'labels': labels,
+                    'data': hist.tolist(),
+                    'colors': [
+                        self.colors['low_confidence'],
+                        self.colors['medium_confidence'],
+                        self.colors['high_confidence'],
+                        self.colors['success']
+                    ]
+                }
         
-        # Create histogram data
-        bins = [0, 50, 70, 85, 100]
-        labels = ['Low (<50%)', 'Medium (50-70%)', 'High (70-85%)', 'Very High (>85%)']
-        
-        hist, _ = np.histogram(confidences, bins=bins)
-        
-        # Save chart data
-        chart_data = {
-            'labels': labels,
-            'data': hist.tolist(),
-            'colors': [
-                self.colors['low_confidence'],
-                self.colors['medium_confidence'],
-                self.colors['high_confidence'],
-                self.colors['success']
-            ]
-        }
-        
-        chart_path = self.reports_dir / "data" / "confidence_chart.json"
-        with open(chart_path, 'w') as f:
-            json.dump(chart_data, f)
-        
-        # Also create static image for email reports
-        self._create_static_chart(confidences, 'confidence')
+        # Always save the chart data (now chart_data is guaranteed to exist)
+        if chart_data:
+            chart_path = self.reports_dir / "data" / "confidence_chart.json"
+            with open(chart_path, 'w') as f:
+                json.dump(chart_data, f)
+            
+            logger.info(f"✅ Saved confidence chart to {chart_path}")
+        else:
+            logger.error("❌ Failed to generate confidence chart data")
     
     def _generate_league_distribution_chart(self):
         """Generate league distribution chart"""
