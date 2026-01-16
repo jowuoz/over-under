@@ -108,7 +108,22 @@ async def main():
         logger.info(f"🎯 Calculated {len(predictions)} predictions with confidence ≥ 0.6")
         
         # 3. Send alerts for high probability games
-        notifier = TelegramNotifier()
+        telegram_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
+        telegram_chat_id = os.getenv('TELEGRAM_CHAT_ID', '')
+        
+        if telegram_token:
+            notifier = TelegramNotifier(bot_token=telegram_token)
+            logger.info("✅ Telegram notifier initialized with token")
+        else:
+            # Create a dummy notifier that won't send actual messages
+            class DummyNotifier:
+                async def send_alert(self, game):
+                    logger.info(f"📨 [DUMMY] Would send alert for {game.get('home_team')} vs {game.get('away_team')}")
+                    return True
+            
+            notifier = DummyNotifier()
+            logger.warning("⚠️ TELEGRAM_BOT_TOKEN not set, using dummy notifier")
+        
         high_prob_games = [
             p for p in predictions 
             if p['over_2.5_probability'] >= 0.75  # Your threshold
