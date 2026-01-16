@@ -814,28 +814,27 @@ class ReportGenerator:
                 'colors': [self.colors['primary']] * 5
             }
         else:
-        
-        # Count games by league
-        league_counts = {}
-        for game in self.predictions:
-            league = game.get('league', 'Unknown')
-            league_counts[league] = league_counts.get(league, 0) + 1
-        
-        # Sort and take top 10
-        sorted_leagues = sorted(league_counts.items(), key=lambda x: x[1], reverse=True)[:10]
-        
-        if not sorted_leagues:
-            return
-        
-        labels = [league for league, count in sorted_leagues]
-        data = [count for league, count in sorted_leagues]
-        
-        # Save chart data
-        chart_data = {
-            'labels': labels,
-            'data': data,
-            'colors': [self.colors['primary']] * len(labels)
-        }
+            # Count games by league
+            league_counts = {}
+            for game in self.predictions:
+                league = game.get('league', 'Unknown')
+                league_counts[league] = league_counts.get(league, 0) + 1
+            
+            # Sort and take top 10
+            sorted_leagues = sorted(league_counts.items(), key=lambda x: x[1], reverse=True)[:10]
+            
+            if not sorted_leagues:
+                return
+            
+            labels = [league for league, count in sorted_leagues]
+            data = [count for league, count in sorted_leagues]
+            
+            # Save chart data
+            chart_data = {
+                'labels': labels,
+                'data': data,
+                'colors': [self.colors['primary']] * len(labels)
+            }
         
         chart_path = self.reports_dir / "data" / "league_chart.json"
         with open(chart_path, 'w') as f:
