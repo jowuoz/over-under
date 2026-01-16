@@ -7,6 +7,7 @@ import yaml
 import json
 from typing import Dict, Any, Optional
 from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 @dataclass
 class ScraperConfig:
