@@ -32,6 +32,13 @@ class PredictorConfig:
     min_minute: int
     max_minute: int
     min_confidence: float
+    model_weights: Dict[str, float] = field(default_factory=lambda: {   # ← add this
+        'time_based': 0.35,
+        'statistical': 0.25,
+        'momentum': 0.20,
+        'league_based': 0.10,
+        'odds_based': 0.10,
+    })
 
 @dataclass
 class NotificationConfig:
