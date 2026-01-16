@@ -13,7 +13,8 @@ python-telegram-bot==20.6
 
 # HTML reporting
 Jinja2==3.1.2
-matplotlib==3.8.2 
+matplotlib==3.8.2
+seaborn==0.13.0 
 
 # Configuration - ADD THIS
 PyYAML==6.0.1
