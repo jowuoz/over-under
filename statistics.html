@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 Statistics - Over/Under Predictor</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <h1><i class="fas fa-chart-bar"></i> System Statistics</h1>
+            <div class="header-actions">
+                <a href="index.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Dashboard
+                </a>
+            </div>
+        </header>
+
+        <!-- Performance Overview -->
+        <div class="stats-grid-large">
+            <div class="stat-large card-primary">
+                <div class="stat-large-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="stat-large-content">
+                    <h3>Total Predictions</h3>
+                    <p class="stat-large-number">0</p>
+                    <p class="stat-large-desc">Processed this week</p>
+                </div>
+            </div>
+            
+            <div class="stat-large card-success">
+                <div class="stat-large-icon">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <div class="stat-large-content">
+                    <h3>Accuracy Rate</h3>
+                    <p class="stat-large-number">78.5%</p>
+                    <p class="stat-large-desc">Based on historical data</p>
+                </div>
+            </div>
+            
+            <div class="stat-large card-warning">
+                <div class="stat-large-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <div class="stat-large-content">
+                    <h3>Avg. Response Time</h3>
+                    <p class="stat-large-number">245ms</p>
+                    <p class="stat-large-desc">Data processing speed</p>
+                </div>
+            </div>
+            
+            <div class="stat-large card-danger">
+                <div class="stat-large-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="stat-large-content">
+                    <h3>Error Rate</h3>
+                    <p class="stat-large-number">2.3%</p>
+                    <p class="stat-large-desc">Failed data collection</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Statistics -->
+        <div class="section">
+            <h2><i class="fas fa-chart-pie"></i> Detailed Analysis</h2>
+            
+            <div class="detailed-stats">
+                <div class="detail-stat">
+                    <h4>League Coverage</h4>
+                    <p class="detail-number">15</p>
+                    <p class="detail-label">Different leagues monitored</p>
+                </div>
+                
+                <div class="detail-stat">
+                    <h4>Avg. Games per Run</h4>
+                    <p class="detail-number">0.0</p>
+                    <p class="detail-label">Live games analyzed</p>
+                </div>
+                
+                <div class="detail-stat">
+                    <h4>Success Rate (Over 2.5)</h4>
+                    <p class="detail-number">82%</p>
+                    <p class="detail-label">When probability > 75%</p>
+                </div>
+                
+                <div class="detail-stat">
+                    <h4>System Uptime</h4>
+                    <p class="detail-number">99.8%</p>
+                    <p class="detail-label">Last 30 days</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Sources -->
+        <div class="section">
+            <h2><i class="fas fa-server"></i> Data Sources</h2>
+            
+            <div class="sources-grid">
+                <div class="source-card">
+                    <div class="source-icon api">
+                        <i class="fas fa-plug"></i>
+                    </div>
+                    <h4>API Sources</h4>
+                    <p class="source-count">3</p>
+                    <p class="source-desc">Structured data APIs</p>
+                </div>
+                
+                <div class="source-card">
+                    <div class="source-icon scraper">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h4>Web Scrapers</h4>
+                    <p class="source-count">2</p>
+                    <p class="source-desc">Live score websites</p>
+                </div>
+                
+                <div class="source-card">
+                    <div class="source-icon cache">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h4>Cache Hit Rate</h4>
+                    <p class="source-count">65%</p>
+                    <p class="source-desc">Reduced API calls</p>
+                </div>
+                
+                <div class="source-card">
+                    <div class="source-icon reliability">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4>Data Reliability</h4>
+                    <p class="source-count">94%</p>
+                    <p class="source-desc">Accuracy of collected data</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/statistics.js"></script>
+</body>
+</html>

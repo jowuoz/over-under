@@ -1,0 +1,14 @@
+{
+  "last_updated": "2026-01-16T11:58:56.428720",
+  "predictions": [],
+  "alerts": [],
+  "summary": {
+    "total_games": 0,
+    "live_games": 0,
+    "active_alerts": 0,
+    "avg_confidence": 0,
+    "high_confidence_pct": 0,
+    "top_league": "N/A",
+    "top_league_games": 0
+  }
+}

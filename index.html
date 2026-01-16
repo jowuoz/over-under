@@ -1,0 +1,191 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>⚽ Over/Under Predictor - Live Dashboard</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚽</text></svg>">
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <meta http-equiv="refresh" content="300">
+        <style>
+            /* Debug info - remove after testing */
+            .debug-info {
+                background: #f0f9ff;
+                padding: 10px;
+                border-radius: 5px;
+                margin-bottom: 15px;
+                font-size: 14px;
+                color: #0369a1;
+                border-left: 4px solid #0ea5e9;
+            }
+            .debug-info strong {
+                color: #0c4a6e;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <!-- Debug Info -->
+            <div class="debug-info">
+                <strong>System Status:</strong> 
+                Loaded 0 predictions | 
+                0 live games | 
+                Last updated: 11:58:56
+            </div>
+            
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-content">
+                    <h1><i class="fas fa-futbol"></i> Over/Under Predictor</h1>
+                    <p class="subtitle">AI-powered over/under prediction system</p>
+                    <div class="header-stats">
+                        <div class="stat-badge">
+                            <i class="fas fa-clock"></i>
+                            <span>Last updated: 2026-01-16 11:58:56</span>
+                        </div>
+                        <div class="stat-badge">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Updates every 5 minutes</span>
+                        </div>
+                        <div class="stat-badge">
+                            <i class="fas fa-database"></i>
+                            <span>Source: Test Data</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card card-primary">
+                <div class="stat-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Live Games</h3>
+                    <p class="stat-number">0</p>
+                    <p class="stat-trend">
+                        <i class="fas fa-arrow-up"></i> 0% from last hour
+                    </p>
+                </div>
+            </div>
+            
+            <div class="stat-card card-success">
+                <div class="stat-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Active Alerts</h3>
+                    <p class="stat-number">0</p>
+                    <p class="stat-trend">
+                        <i class="fas fa-bolt"></i> 0 today
+                    </p>
+                </div>
+            </div>
+            
+            <div class="stat-card card-warning">
+                <div class="stat-icon">
+                    <i class="fas fa-crosshairs"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Avg. Confidence</h3>
+                    <p class="stat-number">0%</p>
+                    <p class="stat-trend">
+                        <i class="fas fa-chart-bar"></i> High: 0%
+                    </p>
+                </div>
+            </div>
+            
+            <div class="stat-card card-info">
+                <div class="stat-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>Top League</h3>
+                    <p class="stat-number">N/A</p>
+                    <p class="stat-trend">
+                        <i class="fas fa-star"></i> 0 games
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts Section -->
+        <section class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-exclamation-triangle"></i> Recent Alerts</h2>
+                <a href="alerts.html" class="btn-view-all">View All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="alerts-container">
+                <div class="empty-state"><i class="fas fa-bell-slash"></i><p>No active alerts at the moment</p></div>
+            </div>
+        </section>
+
+        <!-- Live Games -->
+        <section class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-play-circle"></i> Live Games Analysis</h2>
+                <span class="badge-live">0 Live</span>
+            </div>
+            
+            <div class="games-grid">
+                <div class="empty-state"><i class="fas fa-clock"></i><p>No live games being analyzed</p></div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-pie"></i> Prediction Confidence</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="confidenceChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h3><i class="fas fa-globe-europe"></i> League Distribution</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="leagueChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p><i class="fas fa-code"></i> Powered by AI Prediction System</p>
+                    <p><i class="fas fa-sync-alt"></i> Auto-refresh in <span id="countdown">300</span> seconds</p>
+                </div>
+                <div class="footer-links">
+                    <a href="statistics.html"><i class="fas fa-chart-bar"></i> Statistics</a>
+                    <a href="performance.html"><i class="fas fa-tachometer-alt"></i> Performance</a>
+                    <a href="leagues.html"><i class="fas fa-trophy"></i> Leagues</a>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                <p>© 2026 Over/Under Predictor. All data is for informational purposes only.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/dashboard.js"></script>
+    <script>
+        // Load charts
+        window.addEventListener('DOMContentLoaded', function() {
+            loadConfidenceChart();
+            loadLeagueChart();
+            startCountdown();
+        });
+    </script>
+</body>
+</html>

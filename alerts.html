@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚠️ Alerts Report - Over/Under Predictor</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="page-header">
+            <h1><i class="fas fa-exclamation-triangle"></i> Alerts Report</h1>
+            <div class="header-actions">
+                <a href="index.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+                <button class="btn-export" onclick="exportAlerts()">
+                    <i class="fas fa-download"></i> Export CSV
+                </button>
+            </div>
+        </header>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card card-danger">
+                <h3>High Confidence Alerts</h3>
+                <p class="summary-number">0</p>
+                <p class="summary-desc">Confidence ≥ 80%</p>
+            </div>
+            
+            <div class="summary-card card-warning">
+                <h3>Medium Confidence Alerts</h3>
+                <p class="summary-number">0</p>
+                <p class="summary-desc">60% ≤ Confidence < 80%</p>
+            </div>
+            
+            <div class="summary-card card-secondary">
+                <h3>Low Confidence Alerts</h3>
+                <p class="summary-number">0</p>
+                <p class="summary-desc">Confidence < 60%</p>
+            </div>
+        </div>
+
+        <!-- Alerts Table -->
+        <div class="section">
+            <div class="section-header">
+                <h2><i class="fas fa-list"></i> All Alerts (0)</h2>
+                <div class="table-controls">
+                    <input type="text" id="alertSearch" placeholder="Search alerts..." class="search-input">
+                    <select id="alertFilter" class="filter-select">
+                        <option value="all">All Alerts</option>
+                        <option value="high">High Confidence</option>
+                        <option value="medium">Medium Confidence</option>
+                        <option value="low">Low Confidence</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="alertsTable">
+                    <thead>
+                        <tr>
+                            <th>Match</th>
+                            <th>League</th>
+                            <th>Score</th>
+                            <th>Minute</th>
+                            <th>Over 2.5 Prob</th>
+                            <th>Confidence</th>
+                            <th>Status</th>
+                            <th>Time</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                    </tbody>
+                </table>
+            </div>
+            
+            
+        </div>
+
+        <!-- Historical Alert Trends -->
+        <div class="section">
+            <h2><i class="fas fa-chart-line"></i> Alert Trends</h2>
+            <div class="trends-container">
+                <div class="trend-card">
+                    <h4>Alerts by Hour (Last 24h)</h4>
+                    <div class="trend-placeholder">
+                        <i class="fas fa-chart-bar"></i>
+                        <p>Historical data visualization would appear here</p>
+                    </div>
+                </div>
+                <div class="trend-card">
+                    <h4>Success Rate</h4>
+                    <div class="trend-placeholder">
+                        <i class="fas fa-percentage"></i>
+                        <p>Success rate analysis would appear here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/alerts.js"></script>
+</body>
+</html>
