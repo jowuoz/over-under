@@ -2,6 +2,7 @@
 alert_builder.py - Alert builder for Over/Under Predictor system
 Intelligently builds, prioritizes, and manages alerts for predictions
 """
+from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, Tuple, Set
 from dataclasses import dataclass, field
