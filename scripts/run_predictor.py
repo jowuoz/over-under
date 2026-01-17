@@ -115,18 +115,16 @@ async def main():
             notifier = TelegramNotifier(bot_token=telegram_token)
             logger.info("✅ Telegram notifier initialized with token")
         else:
-            # Create a dummy notifier that won't send actual messages
             class DummyNotifier:
                 async def send_alert(self, game):
                     logger.info(f"📨 [DUMMY] Would send alert for {game.get('home_team')} vs {game.get('away_team')}")
                     return True
-            
             notifier = DummyNotifier()
             logger.warning("⚠️ TELEGRAM_BOT_TOKEN not set, using dummy notifier")
         
         high_prob_games = [
             p for p in predictions 
-            if p['over_2.5_probability'] >= 0.75  # Your threshold
+            if p['over_2.5_probability'] >= 0.75
         ]
         
         alert_count = 0
@@ -150,6 +148,25 @@ async def main():
         )
         logger.info(f"📄 Copied data to reports/data/latest.json for dashboard")
         
+        # ── NEW: Extra safety write (optional but good practice) ─────────────
+        # This writes directly to latest.json even if copy fails
+        try:
+            with open('reports/data/latest.json', 'w') as f:
+                json.dump({
+                    'timestamp': datetime.now().isoformat(),
+                    'predictions': predictions,
+                    'high_probability_games': high_prob_games,
+                    'summary': {
+                        'total_games': len(games),
+                        'total_predictions': len(predictions),
+                        'total_alerts': len(high_prob_games),
+                        'alerts_sent': alert_count
+                    }
+                }, f, indent=2)
+            logger.info("Extra safety write to latest.json completed")
+        except Exception as extra_err:
+            logger.warning(f"Extra safety write failed: {extra_err}")
+        
         # 6. Log completion
         completion_msg = f"✅ Run completed: {len(predictions)} predictions, {len(high_prob_games)} alerts, {alert_count} Telegram notifications sent"
         logger.info(completion_msg)
@@ -163,6 +180,34 @@ async def main():
         print(error_msg)
         import traceback
         logger.error(traceback.format_exc())
+        
+        # ── FORCED FALLBACK JSON WRITE ───────────────────────────────────────
+        # This runs even if the script crashes anywhere above
+        try:
+            os.makedirs('reports/data', exist_ok=True)
+            fallback_data = {
+                "timestamp": datetime.now().isoformat(),
+                "predictions": [],
+                "high_probability_games": [],
+                "summary": {
+                    "total_games": 0,
+                    "total_predictions": 0,
+                    "total_alerts": 0,
+                    "alerts_sent": 0,
+                    "status": "failed",
+                    "error": str(e),
+                    "traceback": traceback.format_exc()
+                },
+                "message": "No predictions this run - script failed. Check GitHub Actions log."
+            }
+            with open('reports/data/latest.json', 'w') as f:
+                json.dump(fallback_data, f, indent=2)
+            logger.info("Forced fallback JSON written to reports/data/latest.json")
+            print("DEBUG: Forced fallback JSON written")
+        except Exception as write_err:
+            logger.error(f"Failed to write fallback JSON: {write_err}")
+            print(f"DEBUG: Failed to write fallback JSON: {write_err}")
+        
         return False
 
 if __name__ == "__main__":
