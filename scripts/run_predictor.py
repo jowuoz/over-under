@@ -5,7 +5,7 @@ Main script that runs in GitHub Actions
 import sys
 import os
 import asyncio
-from src.predictor.models import Team, League, Game, GameStatus
+
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(current_dir)  # Go up one level from scripts/
@@ -77,6 +77,8 @@ except ImportError as e:
 import json
 from datetime import datetime
 import shutil
+
+from src.predictor.models import Team, League, Game, GameStatus
 
 async def main():
     # Initialize logger and data manager
