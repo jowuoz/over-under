@@ -140,11 +140,6 @@ async def main():
                 shots_total=(0, 0),
                 possession=(50.0, 50.0),
                 expected_goals=(0.0, 0.0),
-                goal_rate=0.0,                 # Add this field to Game if missing
-                momentum_score=5.0,            # Default neutral
-                time_decay_factor=0.02,
-                minutes_remaining=90 - (scraped.minute or 0),
-                is_live=True
             )
             
             converted_games.append(game)
