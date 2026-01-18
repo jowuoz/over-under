@@ -162,33 +162,31 @@ async def main():
         print(f"  Confidence level: {metrics.confidence_level.value}")
         
         for game in games:
-           try:
+            print(f"DEBUG - Game: {game.home_team.name} vs {game.away_team.name}")
+    
+            try:
                 metrics = calculator.calculate_probabilities(game)
                 
-                # Debug print — keep this
-                print(f"DEBUG - Game: {game.home_team.name} vs {game.away_team.name}")
                 print(f"  Over 2.5 prob: {metrics.probability_over_25:.1%}")
                 print(f"  Confidence score: {metrics.confidence_score:.2f}")
                 print(f"  Expected total goals: {metrics.expected_total_goals:.2f}")
                 print(f"  Confidence level: {metrics.confidence_level.value}")
                 
-                # Lower threshold for testing
-                if metrics.confidence_score >= 0.0:  # ← temporary 0.0 to see all
+                if metrics.confidence_score >= 0.0:  # low threshold for testing
                     prediction = {
                         'home_team': game.home_team.name,
                         'away_team': game.away_team.name,
                         'over_2.5_probability': metrics.probability_over_25,
                         'confidence': metrics.confidence_score,
-                        # add more if needed
                     }
                     predictions.append(prediction)
                     logger.info(f"Added prediction for {game.home_team.name} vs {game.away_team.name} (conf: {metrics.confidence_score:.2f})")
                 else:
                     logger.info(f"Skipped {game.home_team.name} vs {game.away_team.name} - low confidence ({metrics.confidence_score:.2f})")
                     
-           except Exception as calc_err:
-                logger.error(f"Failed to calculate for {game.home_team.name} vs {game.away_team.name}: {calc_err}")
-                # Optional: add fallback prediction or skip
+            except Exception as calc_err:
+                logger.error(f"Failed to calculate for {game.home_team.name} vs {game.away_team.name}: {str(calc_err)}")
+                print(f"  Calculation failed: {str(calc_err)}")
         
         logger.info(f"🎯 Calculated {len(predictions)} predictions with confidence ≥ 0.6")
         
