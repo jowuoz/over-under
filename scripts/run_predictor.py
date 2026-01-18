@@ -153,10 +153,17 @@ async def main():
         # 2. Calculate probabilities
         calculator = ProbabilityCalculator()
         predictions = []
+
+        # Debug print — add this block
+        print(f"DEBUG - Game: {game.home_team.name} vs {game.away_team.name}")
+        print(f"  Over 2.5 prob: {metrics.probability_over_25:.1%}")
+        print(f"  Confidence score: {metrics.confidence_score:.2f}")
+        print(f"  Expected total goals: {metrics.expected_total_goals:.2f}")
+        print(f"  Confidence level: {metrics.confidence_level.value}")
         
         for game in games:
             metrics = calculator.calculate_probabilities(game)  # renamed for clarity
-            if metrics.confidence_score >= 0.6:
+            if metrics.confidence_score >= 0.0:
                 prediction = {
                     'home_team': game.home_team.name,
                     'away_team': game.away_team.name,
