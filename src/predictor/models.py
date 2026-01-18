@@ -72,6 +72,7 @@ class Team:
     country: Optional[str] = None
     league: Optional[str] = None
     minute: Optional[int] = None 
+    current_minute: int = 0 
     
     # Performance metrics
     avg_goals_scored: float = 0.0
