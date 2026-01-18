@@ -591,7 +591,7 @@ class BaseModel:
         
         return max(0.0, min(1.0, base_confidence))
         
-     def _calculate_poisson_probabilities(self, lambda_param: float) -> Dict[str, float]:
+    def _calculate_poisson_probabilities(self, lambda_param: float) -> Dict[str, float]:
         """Calculate Poisson probabilities for over/under lines"""
         lambda_param = max(0.1, min(lambda_param, 5.0))  # safe bounds
         
