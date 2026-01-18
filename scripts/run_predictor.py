@@ -101,7 +101,7 @@ async def main():
         predictions = []
         
         for game in games:
-            prediction = calculator.predict(game)
+            prediction = calculator.calculate_probabilities(game)
             if prediction['confidence'] >= 0.6:  # Minimum confidence
                 predictions.append(prediction)
         
