@@ -154,7 +154,7 @@ class ProbabilityCalculator:
             self.logger.debug(f"Using cached probabilities for game {game.id}")
             return cached
         
-        self.logger.info(f"Calculating probabilities for {game.home_team.name} vs {game.away_team.name}")
+        self.logger.info(f"Calculating probabilities for {game.home_team} vs {game.away_team}")
         
         try:
             # Run all models
@@ -337,7 +337,7 @@ class ProbabilityCalculator:
         factors = []
         
         # Basic data
-        if game.home_team.name and game.away_team.name:
+        if game.home_team and game.away_team:
             factors.append(0.2)
         
         # Scores
@@ -441,9 +441,9 @@ class ProbabilityCalculator:
         
         # Team factors
         if game.home_team.avg_goals_scored > 2.0:
-            factors.append(f"{game.home_team.name} strong attack ({game.home_team.avg_goals_scored:.1f} avg)")
+            factors.append(f"{game.home_team} strong attack ({game.home_team.avg_goals_scored:.1f} avg)")
         if game.away_team.avg_goals_scored > 2.0:
-            factors.append(f"{game.away_team.name} strong attack ({game.away_team.avg_goals_scored:.1f} avg)")
+            factors.append(f"{game.away_team} strong attack ({game.away_team.avg_goals_scored:.1f} avg)")
         
         # Limit to top 5 factors
         return factors[:5]
@@ -908,16 +908,16 @@ class StatisticalModel(BaseModel):
         
         # Team strength factors
         if home_history['avg_goals_scored'] > 2.0:
-            factors.append(f"{game.home_team.name} strong attack ({home_history['avg_goals_scored']:.1f} avg)")
+            factors.append(f"{game.home_team} strong attack ({home_history['avg_goals_scored']:.1f} avg)")
         
         if away_history['avg_goals_scored'] > 2.0:
-            factors.append(f"{game.away_team.name} strong attack ({away_history['avg_goals_scored']:.1f} avg)")
+            factors.append(f"{game.away_team} strong attack ({away_history['avg_goals_scored']:.1f} avg)")
         
         if home_history['avg_goals_conceded'] > 1.5:
-            factors.append(f"{game.home_team.name} weak defense ({home_history['avg_goals_conceded']:.1f} avg conceded)")
+            factors.append(f"{game.home_team} weak defense ({home_history['avg_goals_conceded']:.1f} avg conceded)")
         
         if away_history['avg_goals_conceded'] > 1.5:
-            factors.append(f"{game.away_team.name} weak defense ({away_history['avg_goals_conceded']:.1f} avg conceded)")
+            factors.append(f"{game.away_team} weak defense ({away_history['avg_goals_conceded']:.1f} avg conceded)")
         
         # Historical over/under rate
         home_over_rate = home_history.get('over_25_rate', 0.5)
@@ -1587,7 +1587,7 @@ if __name__ == "__main__":
     print("Calculating probabilities...")
     metrics = calculator.calculate_probabilities(game)
     
-    print(f"\nResults for {game.home_team.name} vs {game.away_team.name}:")
+    print(f"\nResults for {game.home_team} vs {game.away_team}:")
     print(f"Over 0.5: {metrics.probability_over_05:.1%}")
     print(f"Over 1.5: {metrics.probability_over_15:.1%}")
     print(f"Over 2.5: {metrics.probability_over_25:.1%}")
