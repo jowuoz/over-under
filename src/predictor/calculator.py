@@ -590,6 +590,39 @@ class BaseModel:
         base_confidence *= data_quality
         
         return max(0.0, min(1.0, base_confidence))
+        
+     def _calculate_poisson_probabilities(self, lambda_param: float) -> Dict[str, float]:
+        """Calculate Poisson probabilities for over/under lines"""
+        lambda_param = max(0.1, min(lambda_param, 5.0))  # safe bounds
+        
+        probs = {}
+        
+        # Cumulative P(X <= k)
+        prob_leq = 0.0
+        e_minus_lambda = math.exp(-lambda_param)
+        factorial = 1.0
+        poisson_pmf = e_minus_lambda
+        
+        for k in range(0, 10):  # enough for practical purposes
+            prob_leq += poisson_pmf
+            prob_over = 1.0 - prob_leq
+            
+            if k == 0:
+                probs['over_05'] = prob_over
+            elif k == 1:
+                probs['over_15'] = prob_over
+            elif k == 2:
+                probs['over_25'] = prob_over
+            elif k == 3:
+                probs['over_35'] = prob_over
+            elif k == 4:
+                probs['over_45'] = prob_over
+            
+            # Update for next k
+            factorial *= (k + 1)
+            poisson_pmf *= lambda_param / (k + 1)
+        
+        return probs   
 
 
 # Time-Based Model
