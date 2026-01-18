@@ -186,7 +186,7 @@ async def main():
                 else:
                     logger.info(f"Skipped {game.home_team.name} vs {game.away_team.name} - low confidence ({metrics.confidence_score:.2f})")
                     
-            except Exception as calc_err:
+           except Exception as calc_err:
                 logger.error(f"Failed to calculate for {game.home_team.name} vs {game.away_team.name}: {calc_err}")
                 # Optional: add fallback prediction or skip
         
