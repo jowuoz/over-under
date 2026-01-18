@@ -131,7 +131,7 @@ async def main():
                 away_team=away_team,
                 league=league,
                 start_time=scraped.timestamp,
-                minute=scraped.minute or 0,
+                current_minute=scraped.minute or 0,
                 status=GameStatus.LIVE if 'live' in scraped.status.lower() else GameStatus.SCHEDULED,
                 home_score=scraped.home_score,
                 away_score=scraped.away_score,
