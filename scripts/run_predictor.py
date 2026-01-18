@@ -92,6 +92,62 @@ async def main():
         
         games = result.get('games', [])   # extract the actual list of games
         metadata = result.get('metadata', {})
+
+        # After: games = result.get('games', [])
+        converted_games = []
+        
+        for scraped in games:
+            # Create dummy/minimal Team objects (replace placeholders with real data when available)
+            home_team = Team(
+                id=f"home_{scraped.home_team.lower().replace(' ', '_')}",
+                name=scraped.home_team,
+                avg_goals_scored=1.6,          # ← placeholder (use historical data later)
+                avg_goals_conceded=1.2
+            )
+            
+            away_team = Team(
+                id=f"away_{scraped.away_team.lower().replace(' ', '_')}",
+                name=scraped.away_team,
+                avg_goals_scored=1.4,
+                avg_goals_conceded=1.3
+            )
+            
+            # Minimal League object
+            league = League(
+                id=scraped.league.lower().replace(' ', '_'),
+                name=scraped.league,
+                country=scraped.country,
+                avg_goals_per_game=2.7,        # ← placeholder
+                over_25_rate=0.55
+            )
+            
+            # Convert to full Game object
+            game = Game(
+                id=scraped.id,
+                home_team=home_team,
+                away_team=away_team,
+                league=league,
+                start_time=scraped.timestamp,
+                current_minute=scraped.minute or 0,
+                status=GameStatus.LIVE if 'live' in scraped.status.lower() else GameStatus.SCHEDULED,
+                home_score=scraped.home_score,
+                away_score=scraped.away_score,
+                # Add defaults for missing fields to avoid further crashes
+                shots_on_target=(0, 0),
+                shots_total=(0, 0),
+                possession=(50.0, 50.0),
+                expected_goals=(0.0, 0.0),
+                goal_rate=0.0,                 # Add this field to Game if missing
+                momentum_score=5.0,            # Default neutral
+                time_decay_factor=0.02,
+                minutes_remaining=90 - (scraped.minute or 0),
+                is_live=True
+            )
+            
+            converted_games.append(game)
+        
+        games = converted_games  # Now games are ready for prediction
+        logger.info(f"Converted {len(games)} games to full Game objects")
         
         logger.info(f"📊 Found {len(games)} live games from {metadata.get('total_scrapers', '?')} scrapers")
         print(f"📊 Found {len(games)} live games")
