@@ -345,7 +345,7 @@ class ProbabilityCalculator:
             factors.append(0.2)
         
         # Match minute
-        if game.minute > 0:
+        if game.current_minute > 0:
             factors.append(0.1)
         
         # Statistics
@@ -389,7 +389,7 @@ class ProbabilityCalculator:
             return 0.5  # Neutral for non-live matches
         
         # More minutes = more reliable data
-        minute_factor = min(game.minute / 70, 1.0)
+        minute_factor = min(game.current_minute / 70, 1.0)
         
         # Adjust based on score stability
         score_factor = 1.0
@@ -419,7 +419,7 @@ class ProbabilityCalculator:
         
         # Add game-specific factors
         if game.is_live:
-            factors.append(f"Live match ({game.minute}' elapsed)")
+            factors.append(f"Live match ({game.current_minute}' elapsed)")
             
             if game.total_goals > 0:
                 goal_rate = game.goal_rate
@@ -455,7 +455,7 @@ class ProbabilityCalculator:
             return max(0.0, result.expected_total_goals - game.league.avg_goals_per_game)
         
         # For live games, consider time remaining
-        minutes_remaining = game.minutes_remaining
+        minutes_remaining = game.current_minutes_remaining
         if minutes_remaining <= 0:
             return 0.0
         
@@ -471,7 +471,7 @@ class ProbabilityCalculator:
     
     def _create_cache_key(self, game: Game) -> str:
         """Create cache key for game"""
-        return f"{game.id}_{game.minute}_{game.home_score}_{game.away_score}"
+        return f"{game.id}_{game.current_minute}_{game.home_score}_{game.away_score}"
     
     def _get_from_cache(self, key: str) -> Optional[ProbabilityMetrics]:
         """Get item from cache"""
@@ -580,7 +580,7 @@ class BaseModel:
         # Adjust for match stage
         if game.is_live:
             # More minutes = more confidence
-            minute_factor = min(game.minute / 60, 1.0)
+            minute_factor = min(game.current_minute / 60, 1.0)
             base_confidence *= 0.5 + (minute_factor * 0.5)
         else:
             # Less confidence for non-live matches
@@ -621,7 +621,7 @@ class TimeBasedModel(BaseModel):
         adjusted_rate = (current_rate * time_decay) + (expected_rate * (1 - time_decay))
         
         # Calculate expected additional goals
-        minutes_remaining = game.minutes_remaining
+        minutes_remaining = game.current_minutes_remaining
         expected_additional = adjusted_rate * minutes_remaining
         
         # Calculate Poisson probabilities for additional goals
@@ -637,8 +637,8 @@ class TimeBasedModel(BaseModel):
         confidence_factors = []
         
         # More minutes played = higher confidence
-        if game.minute > 20:
-            confidence_factors.append(min(game.minute / 90, 1.0))
+        if game.current_minute > 20:
+            confidence_factors.append(min(game.current_minute / 90, 1.0))
         
         # Stable scoreline = higher confidence
         if game.total_goals > 0:
@@ -1004,7 +1004,7 @@ class MomentumModel(BaseModel):
     
     def _calculate_expected_from_momentum(self, game: Game, momentum_score: float, intensity: float) -> float:
         """Calculate expected additional goals from momentum"""
-        minutes_remaining = game.minutes_remaining
+        minutes_remaining = game.current_minutes_remaining
         
         # Base rate from current goal rate
         current_rate = game.goal_rate
@@ -1030,9 +1030,9 @@ class MomentumModel(BaseModel):
         confidence_factors = []
         
         # Match duration
-        if game.minute > 30:
+        if game.current_minute > 30:
             confidence_factors.append(0.8)
-        elif game.minute > 15:
+        elif game.current_minute > 15:
             confidence_factors.append(0.6)
         else:
             confidence_factors.append(0.4)
@@ -1091,7 +1091,7 @@ class MomentumModel(BaseModel):
         """Extract warnings from momentum analysis"""
         warnings = []
         
-        if game.minute < 20:
+        if game.current_minute < 20:
             warnings.append("Early stage of match - limited data")
         
         if intensity < 0.2:
@@ -1188,7 +1188,7 @@ class LeagueBasedModel(BaseModel):
         expected_full_match = league_avg
         
         # Calculate expected goals for remaining time
-        proportion_remaining = game.minutes_remaining / 90
+        proportion_remaining = game.current_minutes_remaining / 90
         expected_remaining = expected_full_match * proportion_remaining
         
         # Adjust based on current scoring rate
@@ -1368,7 +1368,7 @@ class OddsBasedModel(BaseModel):
         # Adjust for match status
         if game.is_live:
             # Adjust for time remaining
-            proportion_remaining = game.minutes_remaining / 90
+            proportion_remaining = game.current_minutes_remaining / 90
             lambda_est *= proportion_remaining
         
         return lambda_est
@@ -1387,7 +1387,7 @@ class OddsBasedModel(BaseModel):
                 confidence *= 0.8  # Extreme odds less reliable
         
         # Adjust for match stage
-        if game.is_live and game.minute > 60:
+        if game.is_live and game.current_minute > 60:
             confidence *= 1.1  # More reliable later in match
         
         return max(0.0, min(1.0, confidence))
@@ -1485,7 +1485,7 @@ def calculate_risk_assessment(game: Game, metrics: ProbabilityMetrics) -> RiskAs
     time_risk = 0.0
     if game.is_live:
         # Risk increases as match progresses
-        time_risk = min(game.minute / 90, 0.8)
+        time_risk = min(game.current_minute / 90, 0.8)
     
     # Data risk (based on data completeness)
     data_factors = [
