@@ -162,40 +162,11 @@ async def main():
         print(f"  Confidence level: {metrics.confidence_level.value}")
         
         for game in games:
-            print(f"DEBUG - Processing game: {game.home_team.name} vs {game.away_team.name} (minute: {game.current_minute})")
-    
-            metrics = None  # Pre-define so it's always safe to reference
-            
-            try:
-                metrics = calculator.calculate_probabilities(game)
-                
-                # If we reach here → calculation succeeded
-                print(f"  → Success: Over 2.5 = {metrics.probability_over_25:.1%}")
-                print(f"  → Confidence = {metrics.confidence_score:.2f}")
-                print(f"  → Expected total = {metrics.expected_total_goals:.2f}")
-                print(f"  → Level = {metrics.confidence_level.value}")
-                
-                # Temporary very low threshold to force at least some output
-                if metrics.confidence_score >= 0.6:
-                    prediction = {
-                        'home_team': game.home_team.name,
-                        'away_team': game.away_team.name,
-                        'over_2.5_probability': metrics.probability_over_25,
-                        'confidence': metrics.confidence_score,
-                        'expected_total': metrics.expected_total_goals,
-                    }
-                    predictions.append(prediction)
-                    logger.info(f"Added prediction: {game.home_team.name} vs {game.away_team.name} (conf: {metrics.confidence_score:.2f})")
-                else:
-                    logger.info(f"Skipped: {game.home_team.name} vs {game.away_team.name} - confidence too low ({metrics.confidence_score:.2f})")
-            
-            except Exception as e:
-                logger.error(f"Calculation FAILED for {game.home_team.name} vs {game.away_team.name}: {str(e)}")
-                print(f"  → FAILED: {str(e)}")
+            prediction = calculator.predict(game)
+            if prediction['confidence'] >= 0.6:  # Minimum confidence
+                predictions.append(prediction)
         
         logger.info(f"🎯 Calculated {len(predictions)} predictions with confidence ≥ 0.6")
-        logger.info(f"🎯 Calculated {len(predictions)} predictions (after filtering)")
-        print(f"🎯 Calculated {len(predictions)} predictions")
         
         # 3. Send alerts for high probability games
         telegram_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
