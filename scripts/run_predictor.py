@@ -191,7 +191,7 @@ async def main():
             
             except Exception as e:
                 logger.error(f"Calculation FAILED for {game.home_team.name} vs {game.away_team.name}: {str(e)}")
-                print(f"  → FAILED: {str(e)}"
+                print(f"  → FAILED: {str(e)}")
         
         logger.info(f"🎯 Calculated {len(predictions)} predictions with confidence ≥ 0.6")
         logger.info(f"🎯 Calculated {len(predictions)} predictions (after filtering)")
