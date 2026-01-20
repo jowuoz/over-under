@@ -162,8 +162,19 @@ async def main():
         print(f"  Confidence level: {metrics.confidence_level.value}")
         
         for game in games:
-            prediction = calculator.predict(game)
-            if prediction['confidence'] >= 0.6:  # Minimum confidence
+            metrics = calculator.calculate_probabilities(game)  # ← correct method
+    
+            # Convert ProbabilityMetrics to dict for your existing logic
+            prediction = {
+                'home_team': game.home_team.name,
+                'away_team': game.away_team.name,
+                'over_2.5_probability': metrics.probability_over_25,
+                'confidence': metrics.confidence_score,
+                # add other fields you need
+                'metrics': vars(metrics)  # optional: full metrics
+            }
+            
+            if prediction['confidence'] >= 0.6:
                 predictions.append(prediction)
         
         logger.info(f"🎯 Calculated {len(predictions)} predictions with confidence ≥ 0.6")
