@@ -162,31 +162,36 @@ async def main():
         print(f"  Confidence level: {metrics.confidence_level.value}")
         
         for game in games:
-            print(f"DEBUG - Game: {game.home_team.name} vs {game.away_team.name}")
+            print(f"DEBUG - Processing game: {game.home_team.name} vs {game.away_team.name} (minute: {game.current_minute})")
     
+            metrics = None  # Pre-define so it's always safe to reference
+            
             try:
                 metrics = calculator.calculate_probabilities(game)
                 
-                print(f"  Over 2.5 prob: {metrics.probability_over_25:.1%}")
-                print(f"  Confidence score: {metrics.confidence_score:.2f}")
-                print(f"  Expected total goals: {metrics.expected_total_goals:.2f}")
-                print(f"  Confidence level: {metrics.confidence_level.value}")
+                # If we reach here → calculation succeeded
+                print(f"  → Success: Over 2.5 = {metrics.probability_over_25:.1%}")
+                print(f"  → Confidence = {metrics.confidence_score:.2f}")
+                print(f"  → Expected total = {metrics.expected_total_goals:.2f}")
+                print(f"  → Level = {metrics.confidence_level.value}")
                 
-                if metrics.confidence_score >= 0.0:  # low threshold for testing
+                # Temporary very low threshold to force at least some output
+                if metrics.confidence_score >= 0.6:
                     prediction = {
                         'home_team': game.home_team.name,
                         'away_team': game.away_team.name,
                         'over_2.5_probability': metrics.probability_over_25,
                         'confidence': metrics.confidence_score,
+                        'expected_total': metrics.expected_total_goals,
                     }
                     predictions.append(prediction)
-                    logger.info(f"Added prediction for {game.home_team.name} vs {game.away_team.name} (conf: {metrics.confidence_score:.2f})")
+                    logger.info(f"Added prediction: {game.home_team.name} vs {game.away_team.name} (conf: {metrics.confidence_score:.2f})")
                 else:
-                    logger.info(f"Skipped {game.home_team.name} vs {game.away_team.name} - low confidence ({metrics.confidence_score:.2f})")
-                    
-            except Exception as calc_err:
-                logger.error(f"Failed to calculate for {game.home_team.name} vs {game.away_team.name}: {str(calc_err)}")
-                print(f"  Calculation failed: {str(calc_err)}")
+                    logger.info(f"Skipped: {game.home_team.name} vs {game.away_team.name} - confidence too low ({metrics.confidence_score:.2f})")
+            
+            except Exception as e:
+                logger.error(f"Calculation FAILED for {game.home_team.name} vs {game.away_team.name}: {str(e)}")
+                print(f"  → FAILED: {str(e)}"
         
         logger.info(f"🎯 Calculated {len(predictions)} predictions with confidence ≥ 0.6")
         
