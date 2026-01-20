@@ -194,6 +194,8 @@ async def main():
                 print(f"  → FAILED: {str(e)}"
         
         logger.info(f"🎯 Calculated {len(predictions)} predictions with confidence ≥ 0.6")
+        logger.info(f"🎯 Calculated {len(predictions)} predictions (after filtering)")
+        print(f"🎯 Calculated {len(predictions)} predictions")
         
         # 3. Send alerts for high probability games
         telegram_token = os.getenv('TELEGRAM_BOT_TOKEN', '')
