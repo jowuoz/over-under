@@ -153,17 +153,17 @@ async def main():
         # 2. Calculate probabilities
         calculator = ProbabilityCalculator()
         predictions = []
-
-        # Debug print — add this block
-        print(f"DEBUG - Game: {game.home_team.name} vs {game.away_team.name}")
-        print(f"  Over 2.5 prob: {metrics.probability_over_25:.1%}")
-        print(f"  Confidence score: {metrics.confidence_score:.2f}")
-        print(f"  Expected total goals: {metrics.expected_total_goals:.2f}")
-        print(f"  Confidence level: {metrics.confidence_level.value}")
         
         for game in games:
-            metrics = calculator.calculate_probabilities(game)  # ← correct method
+            metrics = calculator.calculate_probabilities(game)  # ← metrics defined here
     
+            # Debug print — MOVED INSIDE THE LOOP, AFTER metrics is defined
+            print(f"DEBUG - Game: {game.home_team.name} vs {game.away_team.name}")
+            print(f"  Over 2.5 prob: {metrics.probability_over_25:.1%}")
+            print(f"  Confidence score: {metrics.confidence_score:.2f}")
+            print(f"  Expected total goals: {metrics.expected_total_goals:.2f}")
+            print(f"  Confidence level: {metrics.confidence_level.value}")
+            
             # Convert ProbabilityMetrics to dict for your existing logic
             prediction = {
                 'home_team': game.home_team.name,
